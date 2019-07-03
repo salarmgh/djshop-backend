@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .serializers import ProductSerializer, CategorySerializer, ImageSerializer, ProductAttributeSerializer
-from .models import Product, Category, Image, ProductAttribute
+from .serializers import ProductSerializer, CategorySerializer, ImageSerializer, ProductAttributeSerializer, ProductAttributeValueSerializer
+from .models import Product, Category, Image, ProductAttribute, ProductAttributeValue
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -31,3 +31,10 @@ class ProductAttributeViewSet(viewsets.ModelViewSet):
     """
     queryset = ProductAttribute.objects.all()
     serializer_class = ProductAttributeSerializer
+
+class ProductAttributeValueViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = ProductAttributeValue.objects.all()
+    serializer_class = ProductAttributeValueSerializer
