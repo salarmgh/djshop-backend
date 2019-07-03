@@ -1,0 +1,11 @@
+version: "3.4"
+services:
+  app:
+    build: .
+    hostname: app
+    container_name: app
+    ports:
+      - 8080:8080
+    volumes:
+      - ./:/app
+    command: ["--module", "anemone.wsgi:application", "--http", "0:8080","--processes", "4", "--py-autoreload", "1"]
