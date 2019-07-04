@@ -13,7 +13,8 @@ class Product(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    products = models.ManyToManyField(Product, related_name='categories')
+    products = models.ManyToManyField(Product, related_name='categories', blank=True)
+    cover = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
@@ -22,7 +23,7 @@ class Category(models.Model):
 class Image(models.Model):
     title = models.CharField(max_length=100)
     url = models.CharField(max_length=100)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.description
