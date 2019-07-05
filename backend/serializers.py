@@ -9,15 +9,16 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'products')
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ('id', 'name', 'products')
-
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ('id', 'title', 'url', 'product')
+        fields = ('id', 'title', 'url', 'product', 'main')
+
+class CategorySerializer(serializers.ModelSerializer):
+    cover = ImageSerializer(many=False, read_only=True)
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'products', 'cover')
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -28,10 +29,15 @@ class ProductSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super(ProductSerializer, self).to_representation(instance)
 
+        main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
         images = []
         for image in data.pop("images"):
-            images.append({"title": image["title"], "url": image["url"]})
+            if not image["main"]:
+                images.append({"title": image["title"], "url": image["url"]})
+            else:
+                main_image = {"title": image["title"], "url": image["url"]}
         data["images"] = images
+        data["main_image"] = main_image
 
         categories = []
         for category in data.pop("categories"):
