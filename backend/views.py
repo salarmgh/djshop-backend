@@ -1,7 +1,11 @@
 from django.shortcuts import render
-from rest_framework import viewsets
-from .serializers import ProductSerializer, CategorySerializer, ImageSerializer, ProductAttributeSerializer, ProductAttributeValueSerializer
+from rest_framework import viewsets, generics
+from .serializers import ProductSerializer, CategorySerializer, ImageSerializer, ProductAttributeSerializer, ProductAttributeValueSerializer, ProductCategorySerializer
 from .models import Product, Category, Image, ProductAttribute, ProductAttributeValue
+from rest_framework.decorators import list_route
+from rest_framework.response import Response
+from django.http import JsonResponse
+from pprint import pprint
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -38,3 +42,20 @@ class ProductAttributeValueViewSet(viewsets.ModelViewSet):
     """
     queryset = ProductAttributeValue.objects.all()
     serializer_class = ProductAttributeValueSerializer
+
+class ProductCategoryViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = ProductAttributeValue.objects.all()
+    serializer_class = ProductAttributeValueSerializer
+
+
+
+class ProductCategoryViewSet(generics.ListAPIView):
+    serializer_class = ProductCategorySerializer
+
+    def get_queryset(self):
+        category = self.kwargs['category']
+        products = Product.objects.filter(categories__in=category)
+        return products

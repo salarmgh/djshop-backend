@@ -24,11 +24,7 @@ class Image(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=100)
     products = models.ManyToManyField(Product, related_name='categories', blank=True)
-    cover = models.OneToOneField(
-        Image,
-        on_delete=models.CASCADE,
-        blank=True,
-    )
+    cover = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name

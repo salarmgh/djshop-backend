@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Product, Category, Image, ProductAttribute, ProductAttributeValue
-from pprint import pprint
 
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
@@ -15,10 +14,9 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'url', 'product', 'main')
 
 class CategorySerializer(serializers.ModelSerializer):
-    cover = ImageSerializer(many=False, read_only=True)
     class Meta:
         model = Category
-        fields = ('id', 'name', 'products', 'cover')
+        fields = ('id', 'name', 'cover')
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -29,7 +27,10 @@ class ProductSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super(ProductSerializer, self).to_representation(instance)
 
-        main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
+        if len(data["images"]):
+            main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
+        else:
+            main_image = {}
         images = []
         for image in data.pop("images"):
             if not image["main"]:
@@ -60,6 +61,24 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'price', 'images', 'created_at', 'categories', 'attributes')
 
 
+class ProductCategorySerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        data = super(ProductSerializer, self).to_representation(instance)
+
+        if len(data["images"]):
+            main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
+        else:
+            main_image = {}
+        for image in data.pop("images"):
+            if image["main"]:
+                main_image = {"title": image["title"], "url": image["url"]}
+        data["main_image"] = main_image
+
+        return data
+
+    class Meta:
+        model = Product
+        fields = ('id', 'title', 'description', 'price', 'created_at')
 
 
 class ProductAttributeValueSerializer(serializers.ModelSerializer):
