@@ -6,7 +6,6 @@ from django.conf.urls import url
 
 
 urlpatterns = [
-    url('product-category/<str:category>/', views.ProductCategoryViewSet.as_view()),
     path('', include(urls.router.urls)),
 ]
 

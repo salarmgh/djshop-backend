@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Product, Category, Image, ProductAttribute, ProductAttributeValue
+from pprint import pprint
 
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
@@ -62,19 +63,20 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
-    def to_representation(self, instance):
-        data = super(ProductSerializer, self).to_representation(instance)
+    #def to_representation(self, instance):
+    #    pprint(instance)
+    #    data = super(ProductCategorySerializer, self).to_representation(instance)
 
-        if len(data["images"]):
-            main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
-        else:
-            main_image = {}
-        for image in data.pop("images"):
-            if image["main"]:
-                main_image = {"title": image["title"], "url": image["url"]}
-        data["main_image"] = main_image
+        #if len(data["images"]):
+        #    main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
+        #else:
+        #    main_image = {}
+        #for image in data.pop("images"):
+        #    if image["main"]:
+        #        main_image = {"title": image["title"], "url": image["url"]}
+        #data["main_image"] = main_image
 
-        return data
+    #    return data
 
     class Meta:
         model = Product

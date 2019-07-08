@@ -5,6 +5,7 @@ from .models import Product, Category, Image, ProductAttribute, ProductAttribute
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from django.http import JsonResponse
+from rest_framework import mixins
 from pprint import pprint
 
 
@@ -51,11 +52,11 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = ProductAttributeValueSerializer
 
 
-
-class ProductCategoryViewSet(generics.ListAPIView):
-    serializer_class = ProductCategorySerializer
-
-    def get_queryset(self):
-        category = self.kwargs['category']
-        products = Product.objects.filter(categories__in=category)
-        return products
+class ProductCategoryViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    def retrieve(self, request, pk=None):
+        category = Category.objects.get(name=pk)
+        products = Product.objects.filter(categories=category)
+        products_dict = []
+        for product in products:
+            products_dict.append(ProductCategorySerializer(product).data)
+        return JsonResponse(products_dict, safe=False)
