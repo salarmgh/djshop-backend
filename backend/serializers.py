@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import Product, Category, Image, ProductAttribute, ProductAttributeValue
-from pprint import pprint
+from .models import *
+from django.utils.text import slugify
 
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
@@ -15,9 +15,13 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'url', 'product', 'main')
 
 class CategorySerializer(serializers.ModelSerializer):
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title, allow_unicode=True)
+        super(Product, self).save(*args, **kwargs)
+
     class Meta:
         model = Category
-        fields = ('id', 'name', 'cover')
+        fields = ('id', 'name', 'cover', 'slug')
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -57,33 +61,43 @@ class ProductSerializer(serializers.ModelSerializer):
         data["attributes"] = attributes
         return data
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title, allow_unicode=True)
+        super(Product, self).save(*args, **kwargs)
+
     class Meta:
         model = Product
-        fields = ('id', 'title', 'description', 'price', 'images', 'created_at', 'categories', 'attributes')
+        fields = ('id', 'title', 'description', 'price', 'images', 'created_at', 'categories', 'attributes', 'slug')
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
-    #def to_representation(self, instance):
-    #    pprint(instance)
-    #    data = super(ProductCategorySerializer, self).to_representation(instance)
+    images = ImageSerializer(many=True, read_only=True)
+    def to_representation(self, instance):
+        data = super(ProductCategorySerializer, self).to_representation(instance)
 
-        #if len(data["images"]):
-        #    main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
-        #else:
-        #    main_image = {}
-        #for image in data.pop("images"):
-        #    if image["main"]:
-        #        main_image = {"title": image["title"], "url": image["url"]}
-        #data["main_image"] = main_image
+        if len(data["images"]):
+            main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
+        else:
+            main_image = {}
+        for image in data.pop("images"):
+            if image["main"]:
+                main_image = {"title": image["title"], "url": image["url"]}
+        data["main_image"] = main_image
 
-    #    return data
+        return data
 
     class Meta:
         model = Product
-        fields = ('id', 'title', 'description', 'price', 'created_at')
+        fields = ('id', 'title', 'description', 'price', 'created_at', 'images', 'slug')
 
 
 class ProductAttributeValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductAttributeValue
         fields = ('value', 'price', 'attributes', 'products')
+
+
+class CarouselSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Carousel
+        fields = ('id', 'title', 'description', 'image', 'url', 'created_at')

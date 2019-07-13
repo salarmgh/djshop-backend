@@ -5,6 +5,7 @@ class Product(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     price = models.IntegerField()
+    slug = models.SlugField()
     created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -25,6 +26,7 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
     products = models.ManyToManyField(Product, related_name='categories', blank=True)
     cover = models.CharField(max_length=100)
+    slug = models.SlugField()
 
     def __str__(self):
         return self.name
@@ -43,3 +45,12 @@ class ProductAttributeValue(models.Model):
     attributes = models.ForeignKey(ProductAttribute, related_name='attributes', on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, related_name='attribute_values')
 
+class Carousel(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    image = models.CharField(max_length=100)
+    url = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title

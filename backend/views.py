@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics
-from .serializers import ProductSerializer, CategorySerializer, ImageSerializer, ProductAttributeSerializer, ProductAttributeValueSerializer, ProductCategorySerializer
-from .models import Product, Category, Image, ProductAttribute, ProductAttributeValue
+from .serializers import *
+from .models import *
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from django.http import JsonResponse
@@ -15,6 +15,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    lookup_field = 'slug'
 
 class CategoryViewSet(viewsets.ModelViewSet):
     """
@@ -22,6 +23,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    lookup_field = 'slug'
 
 class ImageViewSet(viewsets.ModelViewSet):
     """
@@ -52,11 +54,19 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = ProductAttributeValueSerializer
 
 
-class ProductCategoryViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
-    def retrieve(self, request, pk=None):
-        category = Category.objects.get(name=pk)
-        products = Product.objects.filter(categories=category)
-        products_dict = []
-        for product in products:
-            products_dict.append(ProductCategorySerializer(product).data)
-        return JsonResponse(products_dict, safe=False)
+class ProductCategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
+    serializer_class = ProductCategorySerializer
+    lookup_url_kwarg = "category"
+
+    def get_queryset(self):
+        category = self.kwargs.get(self.lookup_url_kwarg)
+        category_name = Category.objects.get(slug=category)
+        queryset = Product.objects.filter(categories=category_name)
+        return queryset
+
+class CarouselViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Carousel.objects.all()
+    serializer_class = CarouselSerializer
