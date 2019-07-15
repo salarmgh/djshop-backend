@@ -67,7 +67,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'title', 'description', 'price', 'images', 'created_at', 'categories', 'attributes', 'slug')
+        fields = ('id', 'title', 'description', 'price', 'images', 'created_at', 'categories', 'attributes', 'slug', 'featured')
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -101,3 +101,33 @@ class CarouselSerializer(serializers.ModelSerializer):
     class Meta:
         model = Carousel
         fields = ('id', 'title', 'description', 'image', 'url', 'created_at')
+
+class BannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Banner
+        fields = ('id', 'title', 'image', 'url', 'created_at')
+
+class LandingBannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LandingBanner
+        fields = ('id', 'title', 'image', 'url', 'created_at')
+
+class FeaturedProductSerializer(serializers.ModelSerializer):
+    images = ImageSerializer(many=True, read_only=True)
+    def to_representation(self, instance):
+        data = super(FeaturedProductSerializer, self).to_representation(instance)
+
+        if len(data["images"]):
+            main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
+        else:
+            main_image = {}
+        for image in data.pop("images"):
+            if image["main"]:
+                main_image = {"title": image["title"], "url": image["url"]}
+        data["main_image"] = main_image
+
+        return data
+
+    class Meta:
+        model = Product
+        fields = ('id', 'title', 'description', 'price', 'created_at', 'images', 'slug')

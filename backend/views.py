@@ -70,3 +70,24 @@ class CarouselViewSet(viewsets.ModelViewSet):
     """
     queryset = Carousel.objects.all()
     serializer_class = CarouselSerializer
+
+class BannerViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Banner.objects.all()
+    serializer_class = BannerSerializer
+
+class LandingBannerViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = LandingBanner.objects.all()
+    serializer_class = LandingBannerSerializer
+
+class FeaturedProductViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Product.objects.filter(featured=True)
+    serializer_class = FeaturedProductSerializer
