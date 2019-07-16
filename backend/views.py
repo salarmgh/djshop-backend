@@ -85,9 +85,12 @@ class LandingBannerViewSet(viewsets.ModelViewSet):
     queryset = LandingBanner.objects.all()
     serializer_class = LandingBannerSerializer
 
-class FeaturedProductViewSet(viewsets.ModelViewSet):
+class FeaturedProductViewSet(viewsets.ViewSet, generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = Product.objects.filter(featured=True)
     serializer_class = FeaturedProductSerializer
+
+    def get_queryset(self):
+        products = Product.objects.filter(featured=True)
+        return products

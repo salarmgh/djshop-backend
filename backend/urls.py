@@ -13,4 +13,4 @@ router.register(r'product-category/(?P<category>[^/.]+)', ProductCategoryViewSet
 router.register(r'carousel', CarouselViewSet)
 router.register(r'banner', BannerViewSet)
 router.register(r'landing-banner', LandingBannerViewSet)
-router.register(r'featured-product', LandingBannerViewSet)
+router.register(r'featured-product', FeaturedProductViewSet, basename="featured-product")

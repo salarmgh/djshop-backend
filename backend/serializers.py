@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from django.utils.text import slugify
+from pprint import pprint
 
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
@@ -15,13 +16,25 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'url', 'product', 'main')
 
 class CategorySerializer(serializers.ModelSerializer):
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.title, allow_unicode=True)
-        super(Product, self).save(*args, **kwargs)
+    def to_representation(self, instance):
+        data = super(CategorySerializer, self).to_representation(instance)
+        data["slug"] = instance.slug
+        return data
+
+    def create(self, validated_data):
+        validated_data["slug"] = slugify(validated_data["name"], allow_unicode=True)
+        category = Category.objects.create(**validated_data)
+        return category
+
+    def update(self, instance, validated_data):
+        instance.slug = slugify(validated_data["name"], allow_unicode=True)
+        instance.products.set(validated_data["products"])
+
+        return instance
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'cover', 'slug')
+        fields = ('id', 'name', 'cover', 'products')
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -59,15 +72,22 @@ class ProductSerializer(serializers.ModelSerializer):
             attributes.append({attribute["name"]: attrs})
 
         data["attributes"] = attributes
+        data["slug"] = instance.slug
         return data
 
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.title, allow_unicode=True)
-        super(Product, self).save(*args, **kwargs)
+    def create(self, validated_data):
+        validated_data["slug"] = slugify(validated_data["title"], allow_unicode=True)
+        product = Product.objects.create(**validated_data)
+        return product
+
+    def update(self, instance, validated_data):
+        instance.slug = slugify(validated_data["title"], allow_unicode=True)
+
+        return instance
 
     class Meta:
         model = Product
-        fields = ('id', 'title', 'description', 'price', 'images', 'created_at', 'categories', 'attributes', 'slug', 'featured')
+        fields = ('id', 'title', 'description', 'price', 'images', 'created_at', 'categories', 'attributes', 'featured')
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
