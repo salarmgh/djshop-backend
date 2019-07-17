@@ -9,7 +9,7 @@ RUN addgroup -g 1000 app && adduser -u 1000 -HD -G app app && \
 
 COPY --chown=app:app ["requirenments.txt", "/app"]
 
-RUN pip3 install --no-cache-dir -r requirenments.txt
+RUN pip3 install -vvv --no-cache-dir -r requirenments.txt
 
 COPY --chown=app:app [".", "/app"]
 
