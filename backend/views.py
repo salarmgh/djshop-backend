@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 from rest_framework import mixins
 from pprint import pprint
+from rest_framework.permissions import IsAuthenticated
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -94,3 +95,12 @@ class FeaturedProductViewSet(viewsets.ViewSet, generics.ListAPIView):
     def get_queryset(self):
         products = Product.objects.filter(featured=True)
         return products
+
+class TestViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    queryset = LandingBanner.objects.all()
+    serializer_class = LandingBannerSerializer
