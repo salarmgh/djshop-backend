@@ -120,6 +120,15 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost",
 ]
 
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
