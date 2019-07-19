@@ -2,7 +2,38 @@ from rest_framework import serializers
 from .models import *
 from django.utils.text import slugify
 from pprint import pprint
+from django.contrib.auth.hashers import make_password
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = ('id', 'address')
+
+class UserSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        validated_data["password"] = make_password(validated_data["password"])
+        user = User(**validated_data)
+        user.save()
+        return validated_data
+
+    def validate(self, data):
+        """
+        Check that the start is before the stop.
+        """
+        print("HEEEEREEE")
+        if data['start_date'] > data['end_date']:
+            raise serializers.ValidationError("finish must occur after start")
+        return data
+    
+    def update(self, instance, validated_data):
+        print("HEEEEREEE")
+        return instance
+
+    class Meta:
+        model = User
+        fields = ("id", "username", "first_name", "last_name", "email", "number", "password")
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -151,3 +182,15 @@ class FeaturedProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'title', 'description', 'price', 'created_at', 'images', 'slug')
+
+
+class TokenObtainSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token["first_name"] = user.first_name
+        token["last_name"] = user.last_name
+        token["email"] = user.email
+        token["number"] = user.number
+
+        return token

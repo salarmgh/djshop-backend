@@ -1,4 +1,14 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+
+class User(AbstractUser):
+    number = models.CharField(max_length=15)
+
+
+class Address(models.Model):
+    location = models.TextField()
+    addresses = models.ForeignKey(User, related_name="addresses", on_delete=models.CASCADE, blank=True, null=True)
 
 
 class Product(models.Model):

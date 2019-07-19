@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from rest_framework import mixins
 from pprint import pprint
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -104,3 +105,14 @@ class TestViewSet(viewsets.ModelViewSet):
 
     queryset = LandingBanner.objects.all()
     serializer_class = LandingBannerSerializer
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class TokenObtainView(TokenObtainPairView):
+    serializer_class = TokenObtainSerializer
