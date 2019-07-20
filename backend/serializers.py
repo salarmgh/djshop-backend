@@ -18,21 +18,9 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return validated_data
 
-    def validate(self, data):
-        """
-        Check that the start is before the stop.
-        """
-        print("HEEEEREEE")
-        if data['start_date'] > data['end_date']:
-            raise serializers.ValidationError("finish must occur after start")
-        return data
-    
-    def update(self, instance, validated_data):
-        print("HEEEEREEE")
-        return instance
-
     class Meta:
         model = User
+        validators = []
         fields = ("id", "username", "first_name", "last_name", "email", "number", "password")
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
