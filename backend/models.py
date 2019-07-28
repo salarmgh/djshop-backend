@@ -36,7 +36,7 @@ class Image(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=100)
     products = models.ManyToManyField(Product, related_name='categories', blank=True)
-    cover = models.CharField(max_length=100)
+    cover = models.CharField(max_length=100, blank=True, null=True)
     slug = models.SlugField(allow_unicode=True)
 
     def __str__(self):
@@ -54,7 +54,9 @@ class ProductAttributeValue(models.Model):
     value = models.CharField(max_length=100)
     price = models.IntegerField()
     attributes = models.ForeignKey(ProductAttribute, related_name='attributes', on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product, related_name='attribute_values')
+
+    def __str__(self):
+        return self.value
 
 class Carousel(models.Model):
     title = models.CharField(max_length=100)
@@ -83,3 +85,16 @@ class LandingBanner(models.Model):
 
     def __str__(self):
         return self.title
+
+class Cart(models.Model):
+    price = models.IntegerField()
+    user = models.ForeignKey(User, related_name="carts", on_delete=models.CASCADE)
+
+class Order(models.Model):
+    product = models.ForeignKey(Product, related_name="order_products", on_delete=models.CASCADE)
+    attribute = models.ManyToManyField(ProductAttributeValue, related_name="order_attributes")
+    cart = models.ForeignKey(Cart, related_name="orders_cart", on_delete=models.CASCADE, blank=True, null=True)
+    price = models.IntegerField(blank=True)
+
+    def __str__(self):
+        return self.product.title

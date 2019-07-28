@@ -97,14 +97,6 @@ class FeaturedProductViewSet(viewsets.ViewSet, generics.ListAPIView):
         products = Product.objects.filter(featured=True)
         return products
 
-class TestViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    permission_classes = (IsAuthenticated,)
-
-    queryset = LandingBanner.objects.all()
-    serializer_class = LandingBannerSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -113,6 +105,19 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+class OrderViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+class CartViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
 
 class TokenObtainView(TokenObtainPairView):
     serializer_class = TokenObtainSerializer

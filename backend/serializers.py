@@ -18,6 +18,13 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return validated_data
 
+    def update(self, instance, validated_data):
+        validated_data["password"] = make_password(validated_data["password"])
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
     class Meta:
         model = User
         validators = []
@@ -42,12 +49,19 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["slug"] = slugify(validated_data["name"], allow_unicode=True)
+        product = validated_data.pop("products")
         category = Category.objects.create(**validated_data)
+        category.products.set(product)
         return category
 
     def update(self, instance, validated_data):
+        products = validated_data.pop("products")
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
         instance.slug = slugify(validated_data["name"], allow_unicode=True)
-        instance.products.set(validated_data["products"])
+        instance.products.set(products)
+        instance.save()
 
         return instance
 
@@ -100,7 +114,11 @@ class ProductSerializer(serializers.ModelSerializer):
         return product
 
     def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
         instance.slug = slugify(validated_data["title"], allow_unicode=True)
+        instance.save()
 
         return instance
 
@@ -133,7 +151,7 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 class ProductAttributeValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductAttributeValue
-        fields = ('value', 'price', 'attributes', 'products')
+        fields = ('value', 'price', 'attributes')
 
 
 class CarouselSerializer(serializers.ModelSerializer):
@@ -182,3 +200,109 @@ class TokenObtainSerializer(TokenObtainPairSerializer):
         token["number"] = user.number
 
         return token
+
+class OrderSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        data = super(OrderSerializer, self).to_representation(instance)
+
+        product_data = data.pop("product")
+        product_data = Product.objects.get(pk=product_data)
+        data["product_id"] = product_data.id
+        data["title"] = product_data.title
+        data["product_price"] = product_data.price
+        data["slug"] = product_data.slug
+
+        attributes = []
+        for attribute in data.pop("attribute"):
+            attribute_data = ProductAttributeValue.objects.get(pk=attribute)
+            attribute_name = ProductAttribute.objects.get(attributes=attribute)
+            attributes.append(
+                {
+                    "name": attribute_name.name,
+                    "value": attribute_data.value,
+                    "price": attribute_data.price
+                }
+            )
+        data["attributes"] = attributes
+
+        data.pop("cart")
+
+
+        return data
+
+    def create(self, validated_data):
+        price = 0
+        product = validated_data["product"]
+        price = price + product.price
+        for attribute in validated_data["attribute"]:
+            price = price + attribute.price
+
+        validated_data["price"] = price
+        attributes = validated_data.pop('attribute')
+        order = Order.objects.create(**validated_data)
+        order.attribute.set(attributes)
+        validated_data['attribute'] = attributes
+        return validated_data
+
+    def update(self, instance, validated_data):
+        price = 0
+        product = validated_data["product"]
+        price = price + product.price
+        for attribute in validated_data["attribute"]:
+            price = price + attribute.price
+        validated_data["price"] = price
+
+        attribute = validated_data.pop("attribute")
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        instance.attribute.set(attribute)
+
+        return instance
+
+    class Meta:
+        model = Order
+        fields = ('id', 'product', 'attribute', 'cart', 'price')
+
+
+class CartSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        data = super(CartSerializer, self).to_representation(instance)
+
+        orders = data.pop("orders_cart")
+        cart_orders = []
+        for order_id in orders:
+            order = Order.objects.get(pk=order_id)
+            serialized_order = OrderSerializer().to_representation(order)
+            cart_orders.append(serialized_order)
+
+        data["orders"] = cart_orders
+        data["price"] = instance.price
+
+
+        return data
+
+    def create(self, validated_data):
+        price = 0
+        orders = validated_data.pop("orders_cart")
+        for order in orders:
+            price = price + order.price
+
+        validated_data["price"] = price
+        cart = Cart.objects.create(**validated_data)
+        cart.orders_cart.set(orders)
+        return validated_data
+
+    #def update(self, instance, validated_data):
+    #    price = 0
+    #    product = validated_data["product"]
+    #    price = price + product.price
+    #    for attribute in validated_data["attribute"]:
+    #        price = price + attribute.price
+
+    #    instance.price = price
+    #    return instance
+
+    class Meta:
+        model = Cart
+        fields = ('id', 'user', 'orders_cart')
