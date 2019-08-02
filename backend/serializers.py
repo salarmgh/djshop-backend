@@ -101,8 +101,8 @@ class ProductSerializer(serializers.ModelSerializer):
             product_attributes = ProductAttributeValue.objects.filter(attributes=attribute["id"])
             attrs = []
             for attr in product_attributes:
-                attrs.append(attr.value)
-            attributes.append({attribute["name"]: attrs})
+                attrs.append({"id": attr.id, "value": attr.value})
+            attributes.append({"id": attribute["id"], "name": attribute["name"], "value": attrs})
 
         data["attributes"] = attributes
         data["slug"] = instance.slug
