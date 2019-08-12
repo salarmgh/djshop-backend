@@ -202,6 +202,8 @@ class TokenObtainSerializer(TokenObtainPairSerializer):
         return token
 
 class OrderSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
     def to_representation(self, instance):
         data = super(OrderSerializer, self).to_representation(instance)
 
