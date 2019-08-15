@@ -4,6 +4,7 @@ from django.utils.text import slugify
 from pprint import pprint
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.fields import empty
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -227,9 +228,6 @@ class OrderSerializer(serializers.ModelSerializer):
             )
         data["attributes"] = attributes
 
-        data.pop("cart")
-
-
         return data
 
     def create(self, validated_data):
@@ -264,21 +262,21 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('id', 'product', 'attribute', 'cart', 'price')
+        fields = ('id', 'product', 'attribute', 'price')
 
 
 class CartSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super(CartSerializer, self).to_representation(instance)
 
-        orders = data.pop("orders_cart")
-        cart_orders = []
-        for order_id in orders:
-            order = Order.objects.get(pk=order_id)
-            serialized_order = OrderSerializer().to_representation(order)
-            cart_orders.append(serialized_order)
+        #orders = data.pop("cart")
+        #cart_orders = []
+        #for order_id in orders:
+        #    order = Order.objects.get(pk=order_id)
+        #    serialized_order = OrderSerializer().to_representation(order)
+        #    cart_orders.append(serialized_order)
 
-        data["orders"] = cart_orders
+        #data["orders"] = cart_orders
         data["price"] = instance.price
 
 
@@ -307,4 +305,10 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ('id', 'user', 'orders_cart')
+        fields = ('id', 'user', 'orders')
+
+class CreateOrderSerializer(serializers.Serializer):
+
+    orders = OrderSerializer
+    carts = CartSerializer
+

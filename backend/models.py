@@ -86,15 +86,15 @@ class LandingBanner(models.Model):
     def __str__(self):
         return self.title
 
-class Cart(models.Model):
-    price = models.IntegerField()
-    user = models.ForeignKey(User, related_name="carts", on_delete=models.CASCADE)
-
 class Order(models.Model):
     product = models.ForeignKey(Product, related_name="order_products", on_delete=models.CASCADE)
     attribute = models.ManyToManyField(ProductAttributeValue, related_name="order_attributes")
-    cart = models.ForeignKey(Cart, related_name="orders_cart", on_delete=models.CASCADE, blank=True, null=True)
     price = models.IntegerField(blank=True)
 
     def __str__(self):
         return self.product.title
+
+class Cart(models.Model):
+    price = models.IntegerField()
+    user = models.ForeignKey(User, related_name="carts", on_delete=models.CASCADE)
+    orders = models.ManyToManyField(Order, related_name="cart")

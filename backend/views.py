@@ -121,3 +121,30 @@ class CartViewSet(viewsets.ModelViewSet):
 
 class TokenObtainView(TokenObtainPairView):
     serializer_class = TokenObtainSerializer
+
+
+class CreateOrderViewSet(viewsets.ViewSet):
+    def create(self, request):
+        products = request.data["products"]
+        orders = []
+        cart_price = 0
+        orders_price = 0
+        for product in products:
+            product["product"] = Product.objects.get(pk=product["product"])
+            product["price"] = product["product"].price
+
+            attribute = product.pop("attribute")
+            for attr in attribute:
+                attribute_value = ProductAttributeValue.objects.get(pk=attr)
+                product["price"] = product["price"] + attribute_value.price
+            order = Order(**product)
+            order.save()
+            order.attribute.set(attribute)
+            orders.append(order)
+            cart_price = cart_price + product["price"]
+
+        user = User.objects.get(pk=1)
+        cart = Cart(user=user, price=cart_price)
+        cart.save()
+        cart.orders.set(orders)
+        return Response()
