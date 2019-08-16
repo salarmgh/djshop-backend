@@ -203,8 +203,6 @@ class TokenObtainSerializer(TokenObtainPairSerializer):
         return token
 
 class OrderSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
-
     def to_representation(self, instance):
         data = super(OrderSerializer, self).to_representation(instance)
 
@@ -262,21 +260,21 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('id', 'product', 'attribute', 'price')
+        fields = ('id', 'product', 'attribute', 'price', 'count')
 
 
 class CartSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super(CartSerializer, self).to_representation(instance)
 
-        #orders = data.pop("cart")
-        #cart_orders = []
-        #for order_id in orders:
-        #    order = Order.objects.get(pk=order_id)
-        #    serialized_order = OrderSerializer().to_representation(order)
-        #    cart_orders.append(serialized_order)
+        orders = data.pop("orders")
+        cart_orders = []
+        for order_id in orders:
+            order = Order.objects.get(pk=order_id)
+            serialized_order = OrderSerializer().to_representation(order)
+            cart_orders.append(serialized_order)
 
-        #data["orders"] = cart_orders
+        data["orders"] = cart_orders
         data["price"] = instance.price
 
 
@@ -305,7 +303,7 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ('id', 'user', 'orders')
+        fields = ('id', 'user', 'orders', 'created_at')
 
 class CreateOrderSerializer(serializers.Serializer):
 

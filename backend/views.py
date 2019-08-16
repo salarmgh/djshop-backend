@@ -137,13 +137,15 @@ class CreateOrderViewSet(viewsets.ViewSet):
             for attr in attribute:
                 attribute_value = ProductAttributeValue.objects.get(pk=attr)
                 product["price"] = product["price"] + attribute_value.price
+            product["price"] = float(product["price"]) * int(product["count"])
+            pprint(product)
             order = Order(**product)
             order.save()
             order.attribute.set(attribute)
             orders.append(order)
             cart_price = cart_price + product["price"]
 
-        user = User.objects.get(pk=1)
+        user = User.objects.get(pk=int(request.data["user"]))
         cart = Cart(user=user, price=cart_price)
         cart.save()
         cart.orders.set(orders)

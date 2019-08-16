@@ -30,7 +30,7 @@ class Image(models.Model):
     main = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.description
+        return self.title
 
 
 class Category(models.Model):
@@ -90,6 +90,7 @@ class Order(models.Model):
     product = models.ForeignKey(Product, related_name="order_products", on_delete=models.CASCADE)
     attribute = models.ManyToManyField(ProductAttributeValue, related_name="order_attributes")
     price = models.IntegerField(blank=True)
+    count = models.IntegerField()
 
     def __str__(self):
         return self.product.title
@@ -98,3 +99,5 @@ class Cart(models.Model):
     price = models.IntegerField()
     user = models.ForeignKey(User, related_name="carts", on_delete=models.CASCADE)
     orders = models.ManyToManyField(Order, related_name="cart")
+    created_at = models.DateTimeField(auto_now=True)
+

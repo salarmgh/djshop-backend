@@ -1,4 +1,5 @@
 from django.urls import path, include
+from django.contrib import admin
 from rest_framework import routers
 from backend import urls, views
 from django.conf import settings
@@ -8,9 +9,13 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
+from backend.admin import admin_site
 
 
 urlpatterns = [
+    url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
+    url(r'^jet/', include('jet.urls', 'jet')),
+    path('admin/', admin_site.urls),
     path('', include(urls.router.urls)),
     url(r'^token/obtain/$', views.TokenObtainView.as_view(), name='token_obtain_pair'),
     url(r'^token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
