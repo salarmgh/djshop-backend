@@ -4,3 +4,4 @@ uwsgi==2.0.18
 django-cors-headers==3.0.2
 djangorestframework_simplejwt==4.3.0
 django-jet==1.0.8
+psycopg2==2.8.3

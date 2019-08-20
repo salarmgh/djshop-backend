@@ -10,6 +10,7 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 from backend.admin import admin_site
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -20,7 +21,7 @@ urlpatterns = [
     url(r'^token/obtain/$', views.TokenObtainView.as_view(), name='token_obtain_pair'),
     url(r'^token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
     url(r'^token/verify/$', TokenVerifyView.as_view(), name='token_verify'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     from django.contrib.staticfiles import views

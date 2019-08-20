@@ -38,9 +38,14 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
 
 
 class ImageSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        data = super(ImageSerializer, self).to_representation(instance)
+        data["url"] = instance.image.url
+        return data
+
     class Meta:
         model = Image
-        fields = ('id', 'title', 'url', 'product', 'main')
+        fields = ('id', 'title', 'product', 'main')
 
 class CategorySerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
@@ -102,7 +107,7 @@ class ProductSerializer(serializers.ModelSerializer):
             product_attributes = ProductAttributeValue.objects.filter(attributes=attribute["id"])
             attrs = []
             for attr in product_attributes:
-                attrs.append({"id": attr.id, "value": attr.value})
+                attrs.append({"id": attr.id, "value": attr.value, "price": attr.price})
             attributes.append({"id": attribute["id"], "name": attribute["name"], "value": attrs})
 
         data["attributes"] = attributes

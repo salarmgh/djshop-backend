@@ -1,6 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+import os
+import uuid
 
+
+def get_filename(instance, filename):
+    filename, ext = os.path.splitext(filename)
+    filename = '{0}{1}'.format(uuid.uuid4().hex, ext)
+    print(filename)
+    return os.path.join('upload/images/{0}'.format(filename))
 
 class User(AbstractUser):
     number = models.CharField(max_length=15)
@@ -25,12 +35,16 @@ class Product(models.Model):
 
 class Image(models.Model):
     title = models.CharField(max_length=100)
-    url = models.CharField(max_length=100)
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE, blank=True, null=True)
     main = models.BooleanField(default=False)
+    image = models.FileField(upload_to=get_filename)
 
     def __str__(self):
         return self.title
+
+@receiver(post_delete, sender=Image)
+def submission_delete(sender, instance, **kwargs):
+    instance.image.delete(False) 
 
 
 class Category(models.Model):
@@ -45,7 +59,7 @@ class Category(models.Model):
 
 class ProductAttribute(models.Model):
    name = models.CharField(max_length=100)
-   products = models.ManyToManyField(Product, related_name='attributes')
+   products = models.ManyToManyField(Product, related_name='attributes', null=True, blank=True)
 
    def __str__(self):
        return self.name
