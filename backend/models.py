@@ -1,16 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models.signals import post_delete
-from django.dispatch import receiver
 import os
 import uuid
 
 
-def get_filename(instance, filename):
+def get_filename(self, instance, filename):
     filename, ext = os.path.splitext(filename)
     filename = '{0}{1}'.format(uuid.uuid4().hex, ext)
-    print(filename)
     return os.path.join('upload/images/{0}'.format(filename))
+
 
 class User(AbstractUser):
     number = models.CharField(max_length=15)
@@ -39,12 +37,9 @@ class Image(models.Model):
     main = models.BooleanField(default=False)
     image = models.FileField(upload_to=get_filename)
 
+
     def __str__(self):
         return self.title
-
-@receiver(post_delete, sender=Image)
-def submission_delete(sender, instance, **kwargs):
-    instance.image.delete(False) 
 
 
 class Category(models.Model):
@@ -64,6 +59,7 @@ class ProductAttribute(models.Model):
    def __str__(self):
        return self.name
 
+
 class ProductAttributeValue(models.Model):
     value = models.CharField(max_length=100)
     price = models.IntegerField()
@@ -71,6 +67,7 @@ class ProductAttributeValue(models.Model):
 
     def __str__(self):
         return self.value
+
 
 class Carousel(models.Model):
     title = models.CharField(max_length=100)
@@ -82,6 +79,7 @@ class Carousel(models.Model):
     def __str__(self):
         return self.title
 
+
 class Banner(models.Model):
     title = models.CharField(max_length=100)
     image = models.CharField(max_length=100)
@@ -90,6 +88,7 @@ class Banner(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class LandingBanner(models.Model):
     title = models.CharField(max_length=100)
@@ -100,6 +99,7 @@ class LandingBanner(models.Model):
     def __str__(self):
         return self.title
 
+
 class Order(models.Model):
     product = models.ForeignKey(Product, related_name="order_products", on_delete=models.CASCADE)
     attribute = models.ManyToManyField(ProductAttributeValue, related_name="order_attributes")
@@ -109,9 +109,9 @@ class Order(models.Model):
     def __str__(self):
         return self.product.title
 
+
 class Cart(models.Model):
     price = models.IntegerField()
     user = models.ForeignKey(User, related_name="carts", on_delete=models.CASCADE)
     orders = models.ManyToManyField(Order, related_name="cart")
     created_at = models.DateTimeField(auto_now=True)
-
