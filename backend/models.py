@@ -1,7 +1,9 @@
 from django.db import models
+from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 import os
 import uuid
+from .validators import *
 
 
 def get_filename(self, instance, filename):
@@ -11,12 +13,20 @@ def get_filename(self, instance, filename):
 
 
 class User(AbstractUser):
-    number = models.CharField(max_length=15)
+    number = models.CharField(max_length=11, validators=[validate_phone_number])
+
+    def clean(self, *args, **kwargs):
+        validate_phone_number(self.number)
+        super().clean(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 
 class Address(models.Model):
     location = models.TextField()
-    addresses = models.ForeignKey(User, related_name="addresses", on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(User, related_name="addresses", on_delete=models.CASCADE, blank=True)
 
 
 class Product(models.Model):
@@ -26,6 +36,10 @@ class Product(models.Model):
     slug = models.SlugField(allow_unicode=True)
     created_at = models.DateTimeField(auto_now=True)
     featured = models.BooleanField()
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title, allow_unicode=True)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title

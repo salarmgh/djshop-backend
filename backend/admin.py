@@ -38,7 +38,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 admin_site = MyAdminSite()
 
-admin_site.register(User, UserAdmin)
+admin_site.register(User)
 admin_site.register(Product, ProductAdmin)
 admin_site.register(Image)
 admin_site.register(Category)
