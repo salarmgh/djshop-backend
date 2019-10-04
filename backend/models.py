@@ -1,15 +1,10 @@
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 import os
 import uuid
 from .validators import *
-
-
-def get_filename(self, instance, filename):
-    filename, ext = os.path.splitext(filename)
-    filename = '{0}{1}'.format(uuid.uuid4().hex, ext)
-    return os.path.join('upload/images/{0}'.format(filename))
 
 
 class User(AbstractUser):
@@ -30,12 +25,12 @@ class Address(models.Model):
 
 
 class Product(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=300)
     description = models.TextField()
     price = models.IntegerField()
     slug = models.SlugField(allow_unicode=True)
     created_at = models.DateTimeField(auto_now=True)
-    featured = models.BooleanField()
+    featured = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title, allow_unicode=True)
@@ -46,11 +41,10 @@ class Product(models.Model):
 
 
 class Image(models.Model):
-    title = models.CharField(max_length=100)
-    product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE, blank=True, null=True)
+    title = models.CharField(max_length=300)
+    product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
     main = models.BooleanField(default=False)
-    image = models.FileField(upload_to=get_filename)
-
+    image = models.ImageField(upload_to=settings.PRODUCT_IMAGES_DIR)
 
     def __str__(self):
         return self.title
@@ -59,8 +53,12 @@ class Image(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=100)
     products = models.ManyToManyField(Product, related_name='categories', blank=True)
-    cover = models.CharField(max_length=100, blank=True, null=True)
     slug = models.SlugField(allow_unicode=True)
+    cover = models.ImageField(upload_to=settings.CATEGORY_IMAGES_DIR, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -68,7 +66,7 @@ class Category(models.Model):
 
 class ProductAttribute(models.Model):
    name = models.CharField(max_length=100)
-   products = models.ManyToManyField(Product, related_name='attributes', null=True, blank=True)
+   products = models.ManyToManyField(Product, related_name='attributes', blank=True)
 
    def __str__(self):
        return self.name
@@ -77,7 +75,7 @@ class ProductAttribute(models.Model):
 class ProductAttributeValue(models.Model):
     value = models.CharField(max_length=100)
     price = models.IntegerField()
-    attributes = models.ForeignKey(ProductAttribute, related_name='attributes', on_delete=models.CASCADE)
+    attribute = models.ForeignKey(ProductAttribute, related_name='attributes', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.value
@@ -86,7 +84,7 @@ class ProductAttributeValue(models.Model):
 class Carousel(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
-    image = models.CharField(max_length=100)
+    image = models.ImageField(upload_to=settings.CAROUSEL_IMAGES_DIR)
     url = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now=True)
 
@@ -96,8 +94,9 @@ class Carousel(models.Model):
 
 class Banner(models.Model):
     title = models.CharField(max_length=100)
-    image = models.CharField(max_length=100)
+    image = models.ImageField(upload_to=settings.BANNER_IMAGES_DIR)
     url = models.CharField(max_length=100)
+    description = models.CharField(max_length=300)
     created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -106,7 +105,8 @@ class Banner(models.Model):
 
 class LandingBanner(models.Model):
     title = models.CharField(max_length=100)
-    image = models.CharField(max_length=100)
+    image = models.ImageField(upload_to=settings.LANDING_IMAGES_DIR)
+    description = models.CharField(max_length=300)
     url = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now=True)
 
@@ -117,8 +117,11 @@ class LandingBanner(models.Model):
 class Order(models.Model):
     product = models.ForeignKey(Product, related_name="order_products", on_delete=models.CASCADE)
     attribute = models.ManyToManyField(ProductAttributeValue, related_name="order_attributes")
-    price = models.IntegerField(blank=True)
+    price = models.IntegerField()
     count = models.IntegerField()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.product.title

@@ -12,7 +12,7 @@ class AddressTests(TestCase):
 
     def test_can_create_address_with_user(self):
         """
-        Ensure we can create a new address object.
+        Ensure we can create multiple new address object.
         """
         addresses = []
         for i in range(0, 10):

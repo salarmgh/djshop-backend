@@ -157,5 +157,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join('/app/media')
+MEDIA_DIR = 'media/'
+PRODUCT_IMAGES_DIR = 'images/products/'
+CATEGORY_IMAGES_DIR = 'images/categories/'
+CAROUSEL_IMAGES_DIR = 'images/carousel/'
+BANNER_IMAGES_DIR = 'images/banners/'
+LANDING_IMAGES_DIR = 'images/banners/'
 
 JET_DEFAULT_THEME = 'light-gray'

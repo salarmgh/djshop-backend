@@ -21,7 +21,7 @@ class UserTests(TestCase):
 
     def test_can_create_account_with_number(self):
         """
-        Ensure we can create a new account object.
+        Ensure we can create a new user object.
         """
 
         user = self._create_user(self.username, self.password, self.valid_number)
@@ -32,20 +32,25 @@ class UserTests(TestCase):
         self.assertEqual(saved_user.number, self.valid_number)
     
     def test_can_create_account_with_invalid_number_with_more_length(self):
+        """
+        Ensure we can't create a new user object with more length number.
+        """
         user = self._create_user(self.username, self.password, self.invalid_number_with_more_length)
         with self.assertRaises(ValidationError):
             user.save()
 
-
-
     def test_can_create_account_with_invalid_number_with_less_length(self):
+        """
+        Ensure we can't create a new user object with less length number.
+        """
         user = self._create_user(self.username, self.password, self.invalid_number_with_less_length)
         with self.assertRaises(ValidationError):
             user.save()
 
-
     def test_can_create_account_with_invalid_number_with_char(self):
+        """
+        Ensure we can't create a new user object with char inside number.
+        """
         user = self._create_user(self.username, self.password, self.invalid_number_with_char)
         with self.assertRaises(ValidationError):
             user.save()
-
