@@ -1,43 +1,35 @@
 from django.test import TestCase
-import os
-import re
 from django.conf import settings
-from ..models import Product, ProductAttributeValue
+from ..models import Product, ProductAttribute, ProductAttributeValue, Order
 from .helpers import generate_random_string, generate_random_number
 
     
 class OrderTests(TestCase):
     def setUp(self):
-        self.category_name = generate_random_string(15, 50) 
-        self.category_cover = SimpleUploadedFile(name=self.image_name, content=open('backend/tests/assets/placeholder.jpg', 'rb').read(), content_type='image/jpeg')
-
         self.product_title = generate_random_string(15, 50)
         self.product_description = generate_random_string(15, 500)
         self.product_price = generate_random_number(7, 9)
 
+        self.product_attribute_value = generate_random_string(15, 50) 
+        self.product_attribute_price = generate_random_number(6, 8) 
 
-    def test_can_create_category(self):
+        self.product_attribute_name = generate_random_string(15, 50) 
+
+        self.order_count = generate_random_number(1, 3)
+
+
+    def test_can_create_order(self):
         """
-        Ensure we can create a new category object.
+        Ensure we can create a new order object.
         """
-        products = []
+        product = Product.objects.create(title=self.product_title, description=self.product_description, price=self.product_price)
+
+        product_attribute = ProductAttribute.objects.create(name=self.product_attribute_name)
+        attributes = []
+        total_price = 0
         for i in range(0, 10):
-            products.append(Product.objects.create(title=self.product_title, description=self.product_description, price=self.product_price))
+            attributes.append(ProductAttributeValue.objects.create(value=self.product_attribute_value, price=self.product_attribute_price, attribute=product_attribute))
 
-        category = Category.objects.create(name=self.category_name, cover=self.category_cover)
-        category.products.set(products)
-        category.save()
-
-        for i in range(0, 10):
-            self.assertTrue(products[i].categories.all()[0].name == self.category_name)
-
-        self.assertEqual(category.name, self.category_name)
-        self.assertEqual(category.slug, slugify(self.category_name, allow_unicode=True))
-
-        filename, file_extension = os.path.splitext(self.image_name)
-        same_name = re.match(settings.CATEGORY_IMAGES_DIR + filename + ".*" + file_extension, category.cover.name)
-        self.assertTrue(same_name)
-
-        file_exists = os.path.isfile(settings.MEDIA_DIR + category.cover.name)
-        self.assertTrue(file_exists)
-
+        order = Order.objects.create(product=product, count=self.order_count)
+        order.attributes.set(attributes)
+        order.save()

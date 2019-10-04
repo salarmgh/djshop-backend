@@ -234,9 +234,8 @@ class OrderSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        price = 0
         product = validated_data["product"]
-        price = price + product.price
+        price = product.price
         for attribute in validated_data["attribute"]:
             price = price + attribute.price
 

@@ -116,12 +116,20 @@ class LandingBanner(models.Model):
 
 class Order(models.Model):
     product = models.ForeignKey(Product, related_name="order_products", on_delete=models.CASCADE)
-    attribute = models.ManyToManyField(ProductAttributeValue, related_name="order_attributes")
-    price = models.IntegerField()
-    count = models.IntegerField()
+    attributes = models.ManyToManyField(ProductAttributeValue, related_name="order_attributes")
+    price = models.IntegerField(default=0)
+    count = models.IntegerField(default=1)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+        price = int(self.product.price)
+        for attribute in self.attributes.all():
+            price = price + attribute.price
+        self.price = price
+
+        super().save()
+
 
     def __str__(self):
         return self.product.title
