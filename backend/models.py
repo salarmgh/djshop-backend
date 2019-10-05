@@ -121,14 +121,12 @@ class Order(models.Model):
     count = models.IntegerField(default=1)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
         if self.price is None:
-            price = int(self.product.price)
-            super().save()
+            self.price = int(self.product.price)
+            super().save(*args, **kwargs)
         else:
             for attribute in self.attributes.all():
-                price = price + attribute.price
+                self.price = self.price + attribute.price
             self.price = price
             super().save()
 
