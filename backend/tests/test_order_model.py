@@ -8,10 +8,10 @@ class OrderTests(TestCase):
     def setUp(self):
         self.product_title = generate_random_string(15, 50)
         self.product_description = generate_random_string(15, 500)
-        self.product_price = generate_random_number(7, 9)
+        self.product_price = 1000
 
         self.product_attribute_value = generate_random_string(15, 50) 
-        self.product_attribute_price = generate_random_number(6, 8) 
+        self.product_attribute_price = 10
 
         self.product_attribute_name = generate_random_string(15, 50) 
 
@@ -26,10 +26,12 @@ class OrderTests(TestCase):
 
         product_attribute = ProductAttribute.objects.create(name=self.product_attribute_name)
         attributes = []
-        total_price = 0
+        total_price = int(product.price)
         for i in range(0, 10):
             attributes.append(ProductAttributeValue.objects.create(value=self.product_attribute_value, price=self.product_attribute_price, attribute=product_attribute))
+            total_price = total_price + int(self.product_attribute_price)
 
         order = Order.objects.create(product=product, count=self.order_count)
         order.attributes.set(attributes)
         order.save()
+        self.assertEqual(order.price, total_price)
