@@ -51,7 +51,6 @@ class Image(models.Model):
 
 class Attribute(models.Model):
    name = models.CharField(max_length=100)
-   products = models.ManyToManyField(Product, related_name='attributes', blank=True)
 
    def __str__(self):
        return self.name
@@ -68,7 +67,7 @@ class Variant(models.Model):
     name = models.CharField(max_length=200)
     attributes = models.ManyToManyField(Attribute, related_name="variants")
     product = models.ForeignKey(Product, related_name='variants', blank=True, on_delete=models.CASCADE)
-    price = models.PositiveIntegerField()
+    price = models.PositiveIntegerField(default=0)
 
 
 class Category(models.Model):
@@ -119,16 +118,17 @@ class LandingBanner(models.Model):
         return self.title
 
 
-class Order(models.Model):
-    product = models.ForeignKey(Product, related_name="order_products", on_delete=models.CASCADE)
-    price = models.IntegerField(null=True, default=None)
-    count = models.IntegerField(default=1)
-
-    def __str__(self):
-        return self.product.title
-
-
 class Cart(models.Model):
     user = models.ForeignKey(User, related_name="carts", on_delete=models.CASCADE)
-    orders = models.ManyToManyField(Order, related_name="cart")
     created_at = models.DateTimeField(auto_now=True)
+
+
+class Order(models.Model):
+    variant = models.ForeignKey(Variant, related_name="orders", on_delete=models.CASCADE)
+    count = models.IntegerField(default=1)
+    user = models.ForeignKey(User, related_name="orders", on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, related_name="orders", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.variant.name

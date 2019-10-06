@@ -12,19 +12,21 @@ class VariantTests(TestCase):
 
         self.product_attribute_name = generate_random_string(15, 50) 
 
+        self.variant_name = generate_random_string(15, 50) 
+
     def test_can_create_variant(self):
         """
         Ensure we can create a new variant object.
         """
         product = Product.objects.create(title=self.product_title,
                                          description=self.product_description)
-#
+
         attributes = []
         for i in range(10):
-            attributes.append(Attribute.objects.create())
+            attributes.append(Attribute.objects.create(name=self.product_attribute_name))
 
-        variant = Variant.objects.create(product=product)
+        variant = Variant.objects.create(product=product, name=self.variant_name)
         variant.attributes.set(attributes)
 
-        for i in range(0, 10):
-            self.assertTrue(attributes[i].variants.all()[0].name == self.product_attribute_name)
+        for i in range(10):
+            self.assertEqual(attributes[i].variants.all()[0].name, self.variant_name)
