@@ -4,7 +4,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 import os
 import re
 from django.conf import settings
-from ..models import Product, Category
+from ..models import Product, Category, Attribute
 from .helpers import generate_random_string, generate_random_number
 
     
@@ -14,9 +14,10 @@ class CategoryTests(TestCase):
         self.category_name = generate_random_string(15, 50) 
         self.category_cover = SimpleUploadedFile(name=self.image_name, content=open('backend/tests/assets/placeholder.jpg', 'rb').read(), content_type='image/jpeg')
 
+        self.product_attribute_name = generate_random_string(15, 50) 
+
         self.product_title = generate_random_string(15, 50)
         self.product_description = generate_random_string(15, 500)
-        self.product_price = generate_random_number(7, 9)
 
 
     def test_can_create_category(self):
@@ -25,14 +26,22 @@ class CategoryTests(TestCase):
         """
         products = []
         for i in range(0, 10):
-            products.append(Product.objects.create(title=self.product_title, description=self.product_description, price=self.product_price))
+            products.append(Product.objects.create(title=self.product_title, description=self.product_description))
+
+        attributes = []
+        for i in range(0, 10):
+            attributes.append(Attribute.objects.create(name=self.product_attribute_name))
 
         category = Category.objects.create(name=self.category_name, cover=self.category_cover)
         category.products.set(products)
+        category.attributes.set(attributes)
         category.save()
 
         for i in range(0, 10):
             self.assertTrue(products[i].categories.all()[0].name == self.category_name)
+
+        for i in range(0, 10):
+            self.assertTrue(attributes[i].categories.all()[0].name == self.category_name)
 
         self.assertEqual(category.name, self.category_name)
         self.assertEqual(category.slug, slugify(self.category_name, allow_unicode=True))

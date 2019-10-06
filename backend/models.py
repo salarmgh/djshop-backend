@@ -27,7 +27,6 @@ class Address(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=300)
     description = models.TextField()
-    price = models.IntegerField()
     slug = models.SlugField(allow_unicode=True)
     created_at = models.DateTimeField(auto_now=True)
     featured = models.BooleanField(default=False)
@@ -50,21 +49,7 @@ class Image(models.Model):
         return self.title
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-    products = models.ManyToManyField(Product, related_name='categories', blank=True)
-    slug = models.SlugField(allow_unicode=True)
-    cover = models.ImageField(upload_to=settings.CATEGORY_IMAGES_DIR, blank=True)
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name, allow_unicode=True)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
-class ProductAttribute(models.Model):
+class Attribute(models.Model):
    name = models.CharField(max_length=100)
    products = models.ManyToManyField(Product, related_name='attributes', blank=True)
 
@@ -72,13 +57,33 @@ class ProductAttribute(models.Model):
        return self.name
 
 
-class ProductAttributeValue(models.Model):
+class AttributeValue(models.Model):
     value = models.CharField(max_length=100)
-    price = models.IntegerField()
-    attribute = models.ForeignKey(ProductAttribute, related_name='attributes', on_delete=models.CASCADE)
+    attribute = models.ForeignKey(Attribute, related_name='attributes', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.value
+
+class Variant(models.Model):
+    name = models.CharField(max_length=200)
+    attributes = models.ManyToManyField(Attribute, related_name="variants")
+    product = models.ForeignKey(Product, related_name='variants', blank=True, on_delete=models.CASCADE)
+    price = models.PositiveIntegerField()
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    products = models.ManyToManyField(Product, related_name='categories', blank=True)
+    slug = models.SlugField(allow_unicode=True)
+    cover = models.ImageField(upload_to=settings.CATEGORY_IMAGES_DIR, blank=True)
+    attributes = models.ManyToManyField(Attribute, related_name="categories")
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 
 class Carousel(models.Model):
@@ -116,28 +121,14 @@ class LandingBanner(models.Model):
 
 class Order(models.Model):
     product = models.ForeignKey(Product, related_name="order_products", on_delete=models.CASCADE)
-    attributes = models.ManyToManyField(ProductAttributeValue, related_name="order_attributes")
     price = models.IntegerField(null=True, default=None)
     count = models.IntegerField(default=1)
-
-    def save(self, *args, **kwargs):
-        if self.price is None:
-            self.price = int(self.product.price)
-            super().save(*args, **kwargs)
-        else:
-            for attribute in self.attributes.all():
-                self.price = self.price + attribute.price
-            self.price = price
-            super().save()
-
-
 
     def __str__(self):
         return self.product.title
 
 
 class Cart(models.Model):
-    price = models.IntegerField()
     user = models.ForeignKey(User, related_name="carts", on_delete=models.CASCADE)
     orders = models.ManyToManyField(Order, related_name="cart")
     created_at = models.DateTimeField(auto_now=True)

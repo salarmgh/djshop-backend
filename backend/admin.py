@@ -27,14 +27,14 @@ class CategoryInline(admin.StackedInline):
     verbose_name_plural = "Categories"
     extra = 3
 
-class ProductAttributeInline(admin.StackedInline):
-    model = ProductAttribute.products.through
+class AttributeInline(admin.StackedInline):
+    model = Attribute.products.through
     verbose_name = "Attributes"
     verbose_name_plural = "Attribute"
     extra = 3
 
 class ProductAdmin(admin.ModelAdmin):
-    inlines = [ImageInline, CategoryInline, ProductAttributeInline]
+    inlines = [ImageInline, CategoryInline, AttributeInline]
 
 admin_site = MyAdminSite()
 
@@ -42,8 +42,8 @@ admin_site.register(User)
 admin_site.register(Product, ProductAdmin)
 admin_site.register(Image)
 admin_site.register(Category)
-admin_site.register(ProductAttribute)
-admin_site.register(ProductAttributeValue)
+admin_site.register(Attribute)
+admin_site.register(AttributeValue)
 admin_site.register(Carousel)
 admin_site.register(Banner)
 admin_site.register(LandingBanner)

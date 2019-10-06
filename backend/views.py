@@ -34,26 +34,26 @@ class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
 
-class ProductAttributeViewSet(viewsets.ModelViewSet):
+class AttributeViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = ProductAttribute.objects.all()
-    serializer_class = ProductAttributeSerializer
+    queryset = Attribute.objects.all()
+    serializer_class = AttributeSerializer
 
-class ProductAttributeValueViewSet(viewsets.ModelViewSet):
+class AttributeValueViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = ProductAttributeValue.objects.all()
-    serializer_class = ProductAttributeValueSerializer
+    queryset = AttributeValue.objects.all()
+    serializer_class = AttributeValueSerializer
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = ProductAttributeValue.objects.all()
-    serializer_class = ProductAttributeValueSerializer
+    queryset = AttributeValue.objects.all()
+    serializer_class = AttributeValueSerializer
 
 
 class ProductCategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
@@ -135,7 +135,7 @@ class CreateOrderViewSet(viewsets.ViewSet):
 
             attribute = product.pop("attribute")
             for attr in attribute:
-                attribute_value = ProductAttributeValue.objects.get(pk=attr)
+                attribute_value = AttributeValue.objects.get(pk=attr)
                 product["price"] = product["price"] + attribute_value.price
             product["price"] = float(product["price"]) * int(product["count"])
             pprint(product)

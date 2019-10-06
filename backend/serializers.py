@@ -31,9 +31,9 @@ class UserSerializer(serializers.ModelSerializer):
         validators = []
         fields = ("id", "username", "first_name", "last_name", "email", "number", "password")
 
-class ProductAttributeSerializer(serializers.ModelSerializer):
+class AttributeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductAttribute
+        model = Attribute
         fields = ('id', 'name', 'products')
 
 
@@ -77,7 +77,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    attributes = ProductAttributeSerializer(many=True, read_only=True)
+    attributes = AttributeSerializer(many=True, read_only=True)
     categories = CategorySerializer(many=True, read_only=True)
     images = ImageSerializer(many=True, read_only=True)
 
@@ -104,7 +104,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
         attributes = []
         for attribute in data.pop("attributes"):
-            product_attributes = ProductAttributeValue.objects.filter(attributes=attribute["id"])
+            product_attributes = AttributeValue.objects.filter(attributes=attribute["id"])
             attrs = []
             for attr in product_attributes:
                 attrs.append({"id": attr.id, "value": attr.value, "price": attr.price})
@@ -154,9 +154,9 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'price', 'created_at', 'images', 'slug')
 
 
-class ProductAttributeValueSerializer(serializers.ModelSerializer):
+class AttributeValueSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductAttributeValue
+        model = AttributeValue
         fields = ('value', 'price', 'attributes')
 
 
@@ -220,8 +220,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
         attributes = []
         for attribute in data.pop("attribute"):
-            attribute_data = ProductAttributeValue.objects.get(pk=attribute)
-            attribute_name = ProductAttribute.objects.get(attributes=attribute)
+            attribute_data = AttributeValue.objects.get(pk=attribute)
+            attribute_name = Attribute.objects.get(attributes=attribute)
             attributes.append(
                 {
                     "name": attribute_name.name,

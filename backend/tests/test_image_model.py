@@ -11,7 +11,6 @@ class ImageTests(TestCase):
     def setUp(self):
         self.product_title = generate_random_string(15, 50)
         self.product_description = generate_random_string(15, 500)
-        self.product_price = generate_random_number(6, 8)
         self.image_title = generate_random_string(15, 250)
         self.image_main = True
         self.image_name='image.jpg'
@@ -22,7 +21,8 @@ class ImageTests(TestCase):
         """
         Ensure we can create a new Image object.
         """
-        product = Product.objects.create(title=self.product_title, description=self.product_description, price=self.product_price)
+        product = Product.objects.create(title=self.product_title,
+                                         description=self.product_description)
 
         image = Image.objects.create(title=self.image_title, product=product, main=self.image_main, image=self.image)
 

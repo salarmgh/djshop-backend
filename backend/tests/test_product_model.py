@@ -8,7 +8,6 @@ class ProductTests(TestCase):
     def setUp(self):
         self.title = generate_random_string(15, 50)
         self.description = generate_random_string(15, 500)
-        self.price = generate_random_number(7, 9)
         self.featured = True
 
 
@@ -16,7 +15,7 @@ class ProductTests(TestCase):
         """
         Ensure we can create a new product object.
         """
-        product = Product.objects.create(title=self.title, description=self.description, price=self.price, featured=self.featured)
+        product = Product.objects.create(title=self.title, description=self.description, featured=self.featured)
 
         saved_product = Product.objects.get(pk=product.id)
         self.assertEqual(saved_product.title, self.title)
