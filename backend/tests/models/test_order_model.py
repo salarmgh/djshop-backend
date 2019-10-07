@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.conf import settings
-from ..models import Order, Variant, User, Product, Cart
-from .helpers import generate_random_string, generate_random_number
+from ...models import Order, Variant, User, Product, Cart
+from ..helpers import generate_random_string, generate_random_number
 
     
 class OrderTests(TestCase):

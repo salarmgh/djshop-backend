@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils.text import slugify
-from ..models import Product
-from .helpers import generate_random_string, generate_random_number
+from ...models import Product
+from ..helpers import generate_random_string, generate_random_number
 
     
 class ProductTests(TestCase):

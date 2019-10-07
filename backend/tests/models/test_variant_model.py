@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.conf import settings
-from ..models import Variant, Product, Attribute
-from .helpers import generate_random_string, generate_random_number
+from ...models import Variant, Product, Attribute
+from ..helpers import generate_random_string, generate_random_number
 
     
 class VariantTests(TestCase):

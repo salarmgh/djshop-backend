@@ -1,6 +1,6 @@
 from django.test import TestCase
-from ..models import Product, Attribute
-from .helpers import generate_random_string, generate_random_number
+from ...models import Product, Attribute
+from ..helpers import generate_random_string, generate_random_number
 
     
 class AttributesTests(TestCase):

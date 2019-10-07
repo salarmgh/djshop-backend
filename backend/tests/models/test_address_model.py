@@ -1,6 +1,6 @@
 from django.test import TestCase
-from ..models import User, Address
-from .helpers import generate_random_string
+from ...models import User, Address
+from ..helpers import generate_random_string
 
     
 class AddressTests(TestCase):

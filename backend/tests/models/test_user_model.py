@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from ..models import User
-from .helpers import generate_random_number, generate_random_string, generate_random_string_with_numbers
+from ...models import User
+from ..helpers import generate_random_number, generate_random_string, generate_random_string_with_numbers
 
     
 class UserTests(TestCase):

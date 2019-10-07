@@ -4,8 +4,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 import os
 import re
 from django.conf import settings
-from ..models import Product, Category, Attribute
-from .helpers import generate_random_string, generate_random_number, check_file_exists_on_model, check_filename_is_same_on_model
+from ...models import Product, Category, Attribute
+from ..helpers import generate_random_string, generate_random_number, check_file_exists_on_model, check_filename_is_same_on_model
 import shutil
 
     
