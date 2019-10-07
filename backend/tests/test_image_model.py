@@ -3,6 +3,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 from ..models import Product, Image
 from .helpers import generate_random_string, generate_random_number, check_file_exists_on_model, check_filename_is_same_on_model
+import shutil
 
     
 class ImageTests(TestCase):
@@ -44,3 +45,6 @@ class ImageTests(TestCase):
         """
         self.image.delete()
         self.assertFalse(check_file_exists_on_model(self.image, settings.PRODUCT_IMAGES_DIR, self.image_name, settings.MEDIA_DIR))
+
+    def tearDown(self):
+        shutil.rmtree(settings.MEDIA_DIR)

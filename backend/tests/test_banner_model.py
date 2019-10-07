@@ -5,6 +5,7 @@ import re
 from django.conf import settings
 from ..models import Banner
 from .helpers import generate_random_string, generate_random_number
+import shutil
 
     
 class BannerTests(TestCase):
@@ -33,4 +34,6 @@ class BannerTests(TestCase):
         file_exists = os.path.isfile(settings.MEDIA_DIR + banner.image.name)
         self.assertTrue(file_exists)
 
+    def tearDown(self):
+        shutil.rmtree(settings.MEDIA_DIR)
 

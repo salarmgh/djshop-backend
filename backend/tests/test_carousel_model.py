@@ -5,6 +5,7 @@ import re
 from django.conf import settings
 from ..models import Carousel
 from .helpers import generate_random_string, generate_random_number
+import shutil
 
     
 class CarouselTests(TestCase):
@@ -33,3 +34,5 @@ class CarouselTests(TestCase):
         file_exists = os.path.isfile(settings.MEDIA_DIR + carousel.image.name)
         self.assertTrue(file_exists)
 
+    def tearDown(self):
+        shutil.rmtree(settings.MEDIA_DIR)

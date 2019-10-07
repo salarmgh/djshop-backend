@@ -5,6 +5,7 @@ import re
 from django.conf import settings
 from ..models import LandingBanner
 from .helpers import generate_random_string, generate_random_number
+import shutil
 
     
 class LandingBannerTests(TestCase):
@@ -33,5 +34,7 @@ class LandingBannerTests(TestCase):
         file_exists = os.path.isfile(settings.MEDIA_DIR + landing.image.name)
         self.assertTrue(file_exists)
 
+    def tearDown(self):
+        shutil.rmtree(settings.MEDIA_DIR)
 
 

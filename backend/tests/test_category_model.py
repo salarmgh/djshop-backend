@@ -6,6 +6,7 @@ import re
 from django.conf import settings
 from ..models import Product, Category, Attribute
 from .helpers import generate_random_string, generate_random_number, check_file_exists_on_model, check_filename_is_same_on_model
+import shutil
 
     
 class CategoryTests(TestCase):
@@ -64,3 +65,6 @@ class CategoryTests(TestCase):
         """
         self.category.delete()
         self.assertFalse(check_file_exists_on_model(self.category, settings.CATEGORY_IMAGES_DIR, self.image_name, settings.MEDIA_DIR))
+
+    def tearDown(self):
+        shutil.rmtree(settings.MEDIA_DIR)
