@@ -3,7 +3,7 @@ from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 import os
-import uuid
+from django.dispatch import receiver
 from .validators import *
 
 
@@ -48,6 +48,11 @@ class Image(models.Model):
     def __str__(self):
         return self.title
 
+@receiver(models.signals.post_delete, sender=Image)
+def image_auto_delete_file_on_delete(sender, instance, **kwargs):
+    if os.path.isfile(instance.image.path):
+        os.remove(instance.image.path)
+
 
 class Attribute(models.Model):
    name = models.CharField(max_length=100)
@@ -74,7 +79,7 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
     products = models.ManyToManyField(Product, related_name='categories', blank=True)
     slug = models.SlugField(allow_unicode=True)
-    cover = models.ImageField(upload_to=settings.CATEGORY_IMAGES_DIR, blank=True)
+    image = models.ImageField(upload_to=settings.CATEGORY_IMAGES_DIR, blank=True)
     attributes = models.ManyToManyField(Attribute, related_name="categories")
 
     def save(self, *args, **kwargs):
@@ -83,6 +88,11 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+@receiver(models.signals.post_delete, sender=Category)
+def category_auto_delete_file_on_delete(sender, instance, **kwargs):
+    if os.path.isfile(instance.image.path):
+        os.remove(instance.image.path)
 
 
 class Carousel(models.Model):
@@ -95,6 +105,11 @@ class Carousel(models.Model):
     def __str__(self):
         return self.title
 
+@receiver(models.signals.post_delete, sender=Carousel)
+def carousel_auto_delete_file_on_delete(sender, instance, **kwargs):
+    if os.path.isfile(instance.image.path):
+        os.remove(instance.image.path)
+
 
 class Banner(models.Model):
     title = models.CharField(max_length=100)
@@ -106,6 +121,11 @@ class Banner(models.Model):
     def __str__(self):
         return self.title
 
+@receiver(models.signals.post_delete, sender=Banner)
+def banner_auto_delete_file_on_delete(sender, instance, **kwargs):
+    if os.path.isfile(instance.image.path):
+        os.remove(instance.image.path)
+
 
 class LandingBanner(models.Model):
     title = models.CharField(max_length=100)
@@ -116,6 +136,11 @@ class LandingBanner(models.Model):
 
     def __str__(self):
         return self.title
+
+@receiver(models.signals.post_delete, sender=LandingBanner)
+def landing_banner_auto_delete_file_on_delete(sender, instance, **kwargs):
+    if os.path.isfile(instance.image.path):
+        os.remove(instance.image.path)
 
 
 class Cart(models.Model):
