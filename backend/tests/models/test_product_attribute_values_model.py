@@ -17,7 +17,7 @@ class ProductsAttributeValuesTests(TestCase):
 
         product_attribute_value = AttributeValue.objects.create(value=self.product_attribute_value, attribute=attribute)
 
-        self.assertTrue(attribute.attributes.all()[0].value == self.product_attribute_value)
+        self.assertEqual(attribute.attributes.all()[0].value, self.product_attribute_value)
 
         self.assertEqual(product_attribute_value.value, self.product_attribute_value)
 

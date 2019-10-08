@@ -39,10 +39,10 @@ class CategoryTests(TestCase):
         Ensure we can create a new category object.
         """
         for i in range(0, 10):
-            self.assertTrue(self.products[i].categories.all()[0].name == self.category_name)
+            self.assertEqual(self.products[i].categories.all()[0].name, self.category_name)
 
         for i in range(0, 10):
-            self.assertTrue(self.attributes[i].categories.all()[0].name == self.category_name)
+            self.assertEqual(self.attributes[i].categories.all()[0].name, self.category_name)
 
         self.assertEqual(self.category.name, self.category_name)
         self.assertEqual(self.category.slug, slugify(self.category_name, allow_unicode=True))
