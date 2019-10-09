@@ -1,20 +1,20 @@
 from django.test import TestCase
-from ...models import User
+from django.contrib.auth.hashers import make_password
+from ...serializers import UserSerializer
 from ..helpers import generate_random_string, generate_random_number
 
     
-class AttributesTests(TestCase):
+class UserSerializerTests(TestCase):
     def setUp(self):
-        self.username = "sampleuser"
-        self.password = "securepassword"
+        self.user = {"username": "sampleuser", "password": "securepassword", "number": "09124887219", "password": "jkasfhdhjasfd82934nuhfds"}
 
 
-    def test_can_create__attribute(self):
+    def test_can_make_correct_password_with_serializer(self):
         """
-        Ensure we can create a new attribute object.
+        Ensure we make correct password with django hash function
         """
-        product_attribute = Attribute.objects.create(name=self.product_attribute_name)
-
-        self.assertEqual(product_attribute.name, self.product_attribute_name)
-
+        serialized_user = UserSerializer(data=self.user)
+        self.assertTrue(serialized_user.is_valid())
+        serialized_user.save()
+        self.assertNotEqual(serialized_user.data["password"], self.user["password"])
 

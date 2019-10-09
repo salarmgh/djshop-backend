@@ -4,11 +4,12 @@ from .views import *
 
 router = routers.DefaultRouter()
 
+router.register(r'addresses', AddressViewSet)
 router.register(r'products', ProductViewSet)
-router.register(r'category', CategoryViewSet)
-router.register(r'image', ImageViewSet)
-router.register(r'product-attribute', AttributeViewSet)
-router.register(r'product-attribute-value', AttributeValueViewSet)
+router.register(r'categories', CategoryViewSet)
+router.register(r'images', ImageViewSet)
+router.register(r'attributes', AttributeViewSet)
+router.register(r'attribute-values', AttributeValueViewSet)
 router.register(r'product-category/(?P<category>[^/.]+)', ProductCategoryViewSet, basename="product-category")
 router.register(r'carousel', CarouselViewSet)
 router.register(r'banner', BannerViewSet)

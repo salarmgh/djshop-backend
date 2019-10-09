@@ -11,6 +11,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
+class AddressViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+
+
 class ProductViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -18,6 +26,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'slug'
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     """
@@ -27,12 +36,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     lookup_field = 'slug'
 
+
 class ImageViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
+
 
 class AttributeViewSet(viewsets.ModelViewSet):
     """
@@ -41,12 +52,14 @@ class AttributeViewSet(viewsets.ModelViewSet):
     queryset = Attribute.objects.all()
     serializer_class = AttributeSerializer
 
+
 class AttributeValueViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
     queryset = AttributeValue.objects.all()
     serializer_class = AttributeValueSerializer
+
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
     """
@@ -66,12 +79,14 @@ class ProductCategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
         queryset = Product.objects.filter(categories=category_name)
         return queryset
 
+
 class CarouselViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
     queryset = Carousel.objects.all()
     serializer_class = CarouselSerializer
+
 
 class BannerViewSet(viewsets.ModelViewSet):
     """
@@ -80,12 +95,14 @@ class BannerViewSet(viewsets.ModelViewSet):
     queryset = Banner.objects.all()
     serializer_class = BannerSerializer
 
+
 class LandingBannerViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
     queryset = LandingBanner.objects.all()
     serializer_class = LandingBannerSerializer
+
 
 class FeaturedProductViewSet(viewsets.ViewSet, generics.ListAPIView):
     """
@@ -105,6 +122,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+
 class OrderViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -112,12 +130,14 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
+
 class CartViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
+
 
 class TokenObtainView(TokenObtainPairView):
     serializer_class = TokenObtainSerializer
