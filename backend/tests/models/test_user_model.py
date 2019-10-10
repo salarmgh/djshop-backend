@@ -8,13 +8,14 @@ class UserTests(TestCase):
     def setUp(self):
         self.username = "sampleuser"
         self.password = "securepassword"
+        self.email = "asdfsdfsdewr@gmail.com"
         self.valid_number = "09" + generate_random_number(9, 9)
         self.invalid_number_with_more_length = generate_random_number(10, 20)
         self.invalid_number_with_less_length = "09" + generate_random_number(1, 8)
         self.invalid_number_with_char = "09" + generate_random_string_with_numbers(9, 9)
 
-    def _create_user(self, username, password, number):
-        user = User(username=username, number=number)
+    def _create_user(self, username, password, number, email):
+        user = User(username=username, number=number, email=email)
         user.set_password(password)
 
         return user
@@ -24,7 +25,7 @@ class UserTests(TestCase):
         Ensure we can create a new user object.
         """
 
-        user = self._create_user(self.username, self.password, self.valid_number)
+        user = self._create_user(self.username, self.password, self.valid_number, self.email)
         user.save()
 
         saved_user = User.objects.get(username=self.username)
@@ -35,7 +36,7 @@ class UserTests(TestCase):
         """
         Ensure we can't create a new user object with more length number.
         """
-        user = self._create_user(self.username, self.password, self.invalid_number_with_more_length)
+        user = self._create_user(self.username, self.password, self.invalid_number_with_more_length, self.email)
         with self.assertRaises(ValidationError):
             user.save()
 
@@ -43,7 +44,7 @@ class UserTests(TestCase):
         """
         Ensure we can't create a new user object with less length number.
         """
-        user = self._create_user(self.username, self.password, self.invalid_number_with_less_length)
+        user = self._create_user(self.username, self.password, self.invalid_number_with_less_length, self.email)
         with self.assertRaises(ValidationError):
             user.save()
 
@@ -51,6 +52,6 @@ class UserTests(TestCase):
         """
         Ensure we can't create a new user object with char inside number.
         """
-        user = self._create_user(self.username, self.password, self.invalid_number_with_char)
+        user = self._create_user(self.username, self.password, self.invalid_number_with_char, self.email)
         with self.assertRaises(ValidationError):
             user.save()

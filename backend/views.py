@@ -19,14 +19,6 @@ class AddressViewSet(viewsets.ModelViewSet):
     serializer_class = AddressSerializer
 
 
-#class VariantViewSet(viewsets.ModelViewSet):
-#    """
-#    API endpoint that allows users to be viewed or edited.
-#    """
-#    queryset = Variant.objects.all()
-#    serializer_class = VariantSerializer
-
-
 class ProductViewSet(viewsets.ViewSet, generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
@@ -62,7 +54,7 @@ class AttributeValueViewSet(viewsets.ViewSet, generics.ListAPIView):
 
 
 class ProductCategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
-    serializer_class = ProductCategorySerializer
+    serializer_class = ProductSerializer
     lookup_url_kwarg = "category"
 
     def get_queryset(self):
@@ -100,7 +92,7 @@ class FeaturedProductViewSet(viewsets.ViewSet, generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    serializer_class = FeaturedProductSerializer
+    serializer_class = ProductSerializer
 
     def get_queryset(self):
         products = Product.objects.filter(featured=True)

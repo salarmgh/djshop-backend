@@ -17,12 +17,11 @@ class CategoryTests(TestCase):
 
         self.product_attribute_name = generate_random_string(15, 50) 
 
-        self.product_title = generate_random_string(15, 50)
         self.product_description = generate_random_string(15, 500)
 
         self.products = []
         for i in range(0, 10):
-            self.products.append(Product.objects.create(title=self.product_title, description=self.product_description))
+            self.products.append(Product.objects.create(title=generate_random_string(15, 50), description=self.product_description))
 
         self.attributes = []
         for i in range(0, 10):

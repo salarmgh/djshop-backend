@@ -9,6 +9,7 @@ class CartTests(TestCase):
 
         self.username = "sampleuser"
         self.password = "securepassword"
+        self.email = "asdfsdf@gmail.com"
         self.number = "09" + generate_random_number(9, 9)
                
 
@@ -16,7 +17,7 @@ class CartTests(TestCase):
         """
         Ensure we can create a new order object.
         """
-        user = User(username=self.username, number=self.number)
+        user = User(username=self.username, number=self.number, email=self.email)
         user.set_password(self.password)
         user.save()
 

@@ -14,10 +14,9 @@ class ImageTests(TestCase):
                                          description=self.product_description)
 
         self.image_title = generate_random_string(15, 250)
-        self.image_main = True
         self.image_name = generate_random_string(3, 5) + '.jpg'
         self.image_file = SimpleUploadedFile(name=self.image_name, content=open('backend/tests/assets/placeholder.jpg', 'rb').read(), content_type='image/jpeg')
-        self.image = Image.objects.create(title=self.image_title, product=self.product, main=self.image_main, image=self.image_file)
+        self.image = Image.objects.create(title=self.image_title, image=self.image_file)
 
 
     def test_can_create_image(self):
@@ -25,7 +24,6 @@ class ImageTests(TestCase):
         Ensure we can create a new Image object.
         """
         self.assertEqual(self.image.title, self.image_title)
-        self.assertEqual(self.image.main, self.image_main)
         
     def test_is_filename_same_on_model(self):
         """

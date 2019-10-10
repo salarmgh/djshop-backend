@@ -5,7 +5,7 @@ from ..helpers import generate_random_string
     
 class AddressTests(TestCase):
     def setUp(self):
-        user = User(username="sampleuser", number="09124887219")
+        user = User(username="sampleuser", number="09124887219", email="asfdasdf@gmail.com")
         user.set_password("securepassword")
         user.save()
         self.user = user

@@ -30,7 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         validators = []
-        fields = ("id", "username", "first_name", "last_name", "email", "number")
+        fields = ("id", "username", "first_name", "last_name", "email", "number", "addresses")
 
 
 class AttributeSerializer(serializers.ModelSerializer):
@@ -71,15 +71,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'title', 'description', 'image', 'created_at', 'categories', 'featured', 'variants')
-
-
-class ProductCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ('id', 'title', 'description', 'created_at', 'image', 'slug', 'featured', 'categories', 'variants')
-
-
+        fields = ('id', 'title', 'description', 'image', 'created_at', 'categories', 'featured', 'variants', 'slug')
 
 
 class CarouselSerializer(serializers.ModelSerializer):
@@ -87,35 +79,33 @@ class CarouselSerializer(serializers.ModelSerializer):
         model = Carousel
         fields = ('id', 'title', 'description', 'image', 'url', 'created_at')
 
+
 class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banner
-        fields = ('id', 'title', 'image', 'url', 'created_at')
+        fields = ('id', 'title', 'description', 'image', 'url', 'created_at')
+
 
 class LandingBannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = LandingBanner
-        fields = ('id', 'title', 'image', 'url', 'created_at')
+        fields = ('id', 'title', 'description' 'image', 'url', 'created_at')
 
-class FeaturedProductSerializer(serializers.ModelSerializer):
-    images = ImageSerializer(many=True, read_only=True)
-    def to_representation(self, instance):
-        data = super(FeaturedProductSerializer, self).to_representation(instance)
 
-        if len(data["images"]):
-            main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
-        else:
-            main_image = {}
-        for image in data.pop("images"):
-            if image["main"]:
-                main_image = {"title": image["title"], "url": image["url"]}
-        data["main_image"] = main_image
-
-        return data
-
+class OrderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Product
-        fields = ('id', 'title', 'description', 'price', 'created_at', 'images', 'slug')
+        model = Order
+        fields = ('id', 'variant', 'count', 'user', 'cart', 'created_at')
+
+
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = ('id', 'user', 'orders', 'created_at')
+
+class CreateOrderSerializer(serializers.Serializer):
+    orders = OrderSerializer
+    carts = CartSerializer
 
 
 class TokenObtainSerializer(TokenObtainPairSerializer):
@@ -128,111 +118,3 @@ class TokenObtainSerializer(TokenObtainPairSerializer):
         token["number"] = user.number
 
         return token
-
-class OrderSerializer(serializers.ModelSerializer):
-    def to_representation(self, instance):
-        data = super(OrderSerializer, self).to_representation(instance)
-
-        product_data = data.pop("product")
-        product_data = Product.objects.get(pk=product_data)
-        data["product_id"] = product_data.id
-        data["title"] = product_data.title
-        data["product_price"] = product_data.price
-        data["slug"] = product_data.slug
-
-        attributes = []
-        for attribute in data.pop("attribute"):
-            attribute_data = AttributeValue.objects.get(pk=attribute)
-            attribute_name = Attribute.objects.get(attributes=attribute)
-            attributes.append(
-                {
-                    "name": attribute_name.name,
-                    "value": attribute_data.value,
-                    "price": attribute_data.price
-                }
-            )
-        data["attributes"] = attributes
-
-        return data
-
-    def create(self, validated_data):
-        product = validated_data["product"]
-        price = product.price
-        for attribute in validated_data["attribute"]:
-            price = price + attribute.price
-
-        validated_data["price"] = price
-        attributes = validated_data.pop('attribute')
-        order = Order.objects.create(**validated_data)
-        order.attribute.set(attributes)
-        validated_data['attribute'] = attributes
-        return validated_data
-
-    def update(self, instance, validated_data):
-        price = 0
-        product = validated_data["product"]
-        price = price + product.price
-        for attribute in validated_data["attribute"]:
-            price = price + attribute.price
-        validated_data["price"] = price
-
-        attribute = validated_data.pop("attribute")
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        instance.attribute.set(attribute)
-
-        return instance
-
-    class Meta:
-        model = Order
-        fields = ('id', 'product', 'attribute', 'price', 'count')
-
-
-class CartSerializer(serializers.ModelSerializer):
-    def to_representation(self, instance):
-        data = super(CartSerializer, self).to_representation(instance)
-
-        orders = data.pop("orders")
-        cart_orders = []
-        for order_id in orders:
-            order = Order.objects.get(pk=order_id)
-            serialized_order = OrderSerializer().to_representation(order)
-            cart_orders.append(serialized_order)
-
-        data["orders"] = cart_orders
-        data["price"] = instance.price
-
-
-        return data
-
-    def create(self, validated_data):
-        price = 0
-        orders = validated_data.pop("orders_cart")
-        for order in orders:
-            price = price + order.price
-
-        validated_data["price"] = price
-        cart = Cart.objects.create(**validated_data)
-        cart.orders_cart.set(orders)
-        return validated_data
-
-    #def update(self, instance, validated_data):
-    #    price = 0
-    #    product = validated_data["product"]
-    #    price = price + product.price
-    #    for attribute in validated_data["attribute"]:
-    #        price = price + attribute.price
-
-    #    instance.price = price
-    #    return instance
-
-    class Meta:
-        model = Cart
-        fields = ('id', 'user', 'orders', 'created_at')
-
-class CreateOrderSerializer(serializers.Serializer):
-
-    orders = OrderSerializer
-    carts = CartSerializer
-

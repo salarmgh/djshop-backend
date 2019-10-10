@@ -16,6 +16,7 @@ class OrderTests(TestCase):
 
         self.username = "sampleuser"
         self.password = "securepassword"
+        self.email = "asdfasdf@gmail.com"
         self.number = "09" + generate_random_number(9, 9)
                
 
@@ -28,7 +29,7 @@ class OrderTests(TestCase):
 
         variant = Variant.objects.create(product=product, name=self.variant_name)
 
-        user = User(username=self.username, number=self.number)
+        user = User(username=self.username, number=self.number, email=self.email)
         user.set_password(self.password)
         user.save()
 
