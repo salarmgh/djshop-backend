@@ -10,7 +10,7 @@ from rest_framework.fields import empty
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = ('id', 'location')
+        fields = ('id', 'location', 'user')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -39,87 +39,47 @@ class AttributeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
+class AttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeValue
+        fields = ('value', 'attribute')
+
+
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ('id', 'title', 'image', 'main')
+        fields = ('id', 'title', 'image')
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('id', 'name', 'image', 'products', 'attributes')
+        fields = ('id', 'name', 'image', 'attributes')
+
+
+class VariantSerializer(serializers.ModelSerializer):
+    attributes = AttributeSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Variant
+        fields = ('id', 'name', 'attributes', 'product', 'price')
 
 
 class ProductSerializer(serializers.ModelSerializer):
-#    attributes = AttributeSerializer(many=True, read_only=True)
-#    categories = CategorySerializer(many=True, read_only=True)
-    images = ImageSerializer(many=True, read_only=True)
-
-    def to_representation(self, instance):
-        data = super(ProductSerializer, self).to_representation(instance)
-
-        if len(data["images"]):
-            main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
-        else:
-            main_image = {}
-        images = []
-        for image in data.pop("images"):
-            print(image)
-            if not image["main"]:
-                images.append({"title": image["title"], "url": image["image"]})
-            else:
-                main_image = {"title": image["title"], "url": image["image"]}
-        data["images"] = images
-        data["main_image"] = main_image
-
-#        categories = []
-#        for category in data.pop("categories"):
-#            categories.append(category["name"])
-#        data["categories"] = categories
-#
-#        attributes = []
-#        for attribute in data.pop("attributes"):
-#            product_attributes = AttributeValue.objects.filter(attributes=attribute["id"])
-#            attrs = []
-#            for attr in product_attributes:
-#                attrs.append({"id": attr.id, "value": attr.value, "price": attr.price})
-#            attributes.append({"id": attribute["id"], "name": attribute["name"], "value": attrs})
-#
-#        data["attributes"] = attributes
-#        data["slug"] = instance.slug
-        return data
+    variants = VariantSerializer(many=True, read_only=True)
+    categories = CategorySerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
-        fields = ('id', 'title', 'description', 'images', 'created_at', 'categories', 'featured', 'variants')
+        fields = ('id', 'title', 'description', 'image', 'created_at', 'categories', 'featured', 'variants')
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
-    images = ImageSerializer(many=True, read_only=True)
-    def to_representation(self, instance):
-        data = super(ProductCategorySerializer, self).to_representation(instance)
-
-        if len(data["images"]):
-            main_image = {"title": data["images"][0]["title"], "title": data["images"][0]["url"]}
-        else:
-            main_image = {}
-        for image in data.pop("images"):
-            if image["main"]:
-                main_image = {"title": image["title"], "url": image["url"]}
-        data["main_image"] = main_image
-
-        return data
-
     class Meta:
         model = Product
-        fields = ('id', 'title', 'description', 'price', 'created_at', 'images', 'slug')
+        fields = ('id', 'title', 'description', 'created_at', 'image', 'slug', 'featured', 'categories', 'variants')
 
 
-class AttributeValueSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AttributeValue
-        fields = ('value', 'price', 'attributes')
 
 
 class CarouselSerializer(serializers.ModelSerializer):

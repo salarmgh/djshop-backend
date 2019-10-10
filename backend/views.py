@@ -19,7 +19,15 @@ class AddressViewSet(viewsets.ModelViewSet):
     serializer_class = AddressSerializer
 
 
-class ProductViewSet(viewsets.ModelViewSet):
+#class VariantViewSet(viewsets.ModelViewSet):
+#    """
+#    API endpoint that allows users to be viewed or edited.
+#    """
+#    queryset = Variant.objects.all()
+#    serializer_class = VariantSerializer
+
+
+class ProductViewSet(viewsets.ViewSet, generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -28,7 +36,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     lookup_field = 'slug'
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -37,15 +45,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     lookup_field = 'slug'
 
 
-class ImageViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = Image.objects.all()
-    serializer_class = ImageSerializer
-
-
-class AttributeViewSet(viewsets.ModelViewSet):
+class AttributeViewSet(viewsets.ViewSet, generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -53,15 +53,7 @@ class AttributeViewSet(viewsets.ModelViewSet):
     serializer_class = AttributeSerializer
 
 
-class AttributeValueViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = AttributeValue.objects.all()
-    serializer_class = AttributeValueSerializer
-
-
-class ProductCategoryViewSet(viewsets.ModelViewSet):
+class AttributeValueViewSet(viewsets.ViewSet, generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
     """

@@ -9,7 +9,7 @@ from .validators import *
 
 
 class User(AbstractUser):
-    number = models.CharField(max_length=11, validators=[validate_phone_number])
+    number = models.CharField(max_length=11, validators=[validate_phone_number], blank=True)
     email = models.EmailField(_('email address'), blank=False, null=False)
 
     def clean(self, *args, **kwargs):
@@ -26,25 +26,8 @@ class Address(models.Model):
     user = models.ForeignKey(User, related_name="addresses", on_delete=models.CASCADE, blank=True)
 
 
-class Product(models.Model):
-    title = models.CharField(max_length=300, unique=True)
-    description = models.TextField()
-    slug = models.SlugField(allow_unicode=True, unique=True)
-    created_at = models.DateTimeField(auto_now=True)
-    featured = models.BooleanField(default=False)
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.title, allow_unicode=True)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
-
 class Image(models.Model):
     title = models.CharField(max_length=300)
-    product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE, blank=True, null=True)
-    main = models.BooleanField(default=False)
     image = models.ImageField(upload_to=settings.PRODUCT_IMAGES_DIR)
 
     def __str__(self):
@@ -54,6 +37,22 @@ class Image(models.Model):
 def image_auto_delete_file_on_delete(sender, instance, **kwargs):
     if os.path.isfile(instance.image.path):
         os.remove(instance.image.path)
+
+
+class Product(models.Model):
+    title = models.CharField(max_length=300, unique=True)
+    description = models.TextField()
+    slug = models.SlugField(allow_unicode=True, unique=True)
+    created_at = models.DateTimeField(auto_now=True)
+    featured = models.BooleanField(default=False)
+    image = models.ForeignKey(Image, related_name="products", on_delete=models.CASCADE, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title, allow_unicode=True)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
 
 
 class Attribute(models.Model):
