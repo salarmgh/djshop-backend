@@ -7,12 +7,6 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.fields import empty
 
 
-class AddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Address
-        fields = ('id', 'location', 'user')
-
-
 class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["password"] = make_password(validated_data["password"])
@@ -29,7 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        validators = []
         fields = ("id", "username", "first_name", "last_name", "email", "number", "addresses")
 
 
@@ -59,10 +52,11 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class VariantSerializer(serializers.ModelSerializer):
     attributes = AttributeSerializer(many=True, read_only=True)
+    images = AttributeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Variant
-        fields = ('id', 'name', 'attributes', 'product', 'price')
+        fields = ('id', 'name', 'attributes', 'product', 'price', 'images')
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -102,10 +96,6 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ('id', 'user', 'orders', 'created_at')
-
-class CreateOrderSerializer(serializers.Serializer):
-    orders = OrderSerializer
-    carts = CartSerializer
 
 
 class TokenObtainSerializer(TokenObtainPairSerializer):

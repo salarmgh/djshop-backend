@@ -74,7 +74,7 @@ class Variant(models.Model):
     attributes = models.ManyToManyField(Attribute, related_name="variants")
     product = models.ForeignKey(Product, related_name='variants', blank=True, on_delete=models.CASCADE)
     price = models.PositiveIntegerField(default=0)
-    image = models.ManyToManyField(Image, related_name="variants", blank=True)
+    images = models.ManyToManyField(Image, related_name="variants", blank=True)
 
 
 class Category(models.Model):

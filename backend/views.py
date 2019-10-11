@@ -11,14 +11,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
-class AddressViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = Address.objects.all()
-    serializer_class = AddressSerializer
-
-
 class ProductViewSet(viewsets.ViewSet, generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
@@ -121,6 +113,14 @@ class CartViewSet(viewsets.ModelViewSet):
     """
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
+
+
+class VariantViewSet(viewsets.ViewSet, generics.ListAPIView):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Variant.objects.all()
+    serializer_class = VariantSerializer
 
 
 class TokenObtainView(TokenObtainPairView):

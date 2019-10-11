@@ -4,8 +4,8 @@ from .views import *
 
 router = routers.DefaultRouter()
 
-router.register(r'addresses', AddressViewSet)
 router.register(r'products', ProductViewSet)
+router.register(r'variants', VariantViewSet)
 router.register(r'categories', CategoryViewSet)
 router.register(r'attributes', AttributeViewSet)
 router.register(r'attribute-values', AttributeValueViewSet)
