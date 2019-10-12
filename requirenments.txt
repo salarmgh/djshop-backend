@@ -6,3 +6,4 @@ djangorestframework_simplejwt==4.3.0
 django-jet==1.0.8
 psycopg2==2.8.3
 pillow==6.2.0
+elasticsearch-dsl==7.0.0

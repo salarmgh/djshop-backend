@@ -3,9 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
-import os
-from django.dispatch import receiver
 from .validators import *
+from .elasticsearch import ProductIndex
 
 
 class User(AbstractUser):
@@ -33,11 +32,6 @@ class Image(models.Model):
     def __str__(self):
         return self.title
 
-@receiver(models.signals.post_delete, sender=Image)
-def image_auto_delete_file_on_delete(sender, instance, **kwargs):
-    if os.path.isfile(instance.image.path):
-        os.remove(instance.image.path)
-
 
 class Product(models.Model):
     title = models.CharField(max_length=300, unique=True)
@@ -50,6 +44,7 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title, allow_unicode=True)
         super().save(*args, **kwargs)
+
 
     def __str__(self):
         return self.title
@@ -76,6 +71,21 @@ class Variant(models.Model):
     price = models.PositiveIntegerField(default=0)
     images = models.ManyToManyField(Image, related_name="variants", blank=True)
 
+#    def indexing(self):
+#        obj = ProductIndex(
+#            meta={'id': self.id},
+#            title=self.title,
+#            description=self.description,
+#            created_at=self.created_at,
+#            featured=self.featured,
+#            image=self.image.image.url
+#        )
+#        obj.save()
+#        return obj.to_dict(include_meta=True)
+
+   def __str__(self):
+       return self.name
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -91,11 +101,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-@receiver(models.signals.post_delete, sender=Category)
-def category_auto_delete_file_on_delete(sender, instance, **kwargs):
-    if os.path.isfile(instance.image.path):
-        os.remove(instance.image.path)
-
 
 class Carousel(models.Model):
     title = models.CharField(max_length=100)
@@ -106,11 +111,6 @@ class Carousel(models.Model):
 
     def __str__(self):
         return self.title
-
-@receiver(models.signals.post_delete, sender=Carousel)
-def carousel_auto_delete_file_on_delete(sender, instance, **kwargs):
-    if os.path.isfile(instance.image.path):
-        os.remove(instance.image.path)
 
 
 class Banner(models.Model):
@@ -123,11 +123,6 @@ class Banner(models.Model):
     def __str__(self):
         return self.title
 
-@receiver(models.signals.post_delete, sender=Banner)
-def banner_auto_delete_file_on_delete(sender, instance, **kwargs):
-    if os.path.isfile(instance.image.path):
-        os.remove(instance.image.path)
-
 
 class LandingBanner(models.Model):
     title = models.CharField(max_length=100)
@@ -138,11 +133,6 @@ class LandingBanner(models.Model):
 
     def __str__(self):
         return self.title
-
-@receiver(models.signals.post_delete, sender=LandingBanner)
-def landing_banner_auto_delete_file_on_delete(sender, instance, **kwargs):
-    if os.path.isfile(instance.image.path):
-        os.remove(instance.image.path)
 
 
 class Cart(models.Model):
