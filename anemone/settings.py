@@ -165,7 +165,3 @@ BANNER_IMAGES_DIR = 'images/banners/'
 LANDING_IMAGES_DIR = 'images/banners/'
 
 JET_DEFAULT_THEME = 'light-gray'
-
-ES_CONNECTIONS = ["http://elasticsearch:9200"]
-
-ES_DEFAULT_BATCH_SIZE = 1000

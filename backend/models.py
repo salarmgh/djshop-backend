@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from .es_models import VariantIndex
 from .validators import *
-from .elasticsearch import ProductIndex
 
 
 class User(AbstractUser):
@@ -51,10 +51,10 @@ class Product(models.Model):
 
 
 class Attribute(models.Model):
-   name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
-   def __str__(self):
-       return self.name
+    def __str__(self):
+        return self.name
 
 
 class AttributeValue(models.Model):
@@ -71,20 +71,21 @@ class Variant(models.Model):
     price = models.PositiveIntegerField(default=0)
     images = models.ManyToManyField(Image, related_name="variants", blank=True)
 
-#    def indexing(self):
-#        obj = ProductIndex(
-#            meta={'id': self.id},
-#            title=self.title,
-#            description=self.description,
-#            created_at=self.created_at,
-#            featured=self.featured,
-#            image=self.image.image.url
-#        )
-#        obj.save()
-#        return obj.to_dict(include_meta=True)
+    def indexing(self):
+        print(self.attributes)
+        obj = VariantIndex(
+            meta={'id': self.id},
+            name=self.name,
+            attributes=self.attributes,
+            product=self.product,
+            price=self.price,
+            body='',
+        )
+        obj.save()
+        return obj.to_dict(include_meta=True)
 
-   def __str__(self):
-       return self.name
+    def __str__(self):
+        return self.name
 
 
 class Category(models.Model):
