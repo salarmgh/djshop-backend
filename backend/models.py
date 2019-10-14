@@ -6,6 +6,7 @@ from django.conf import settings
 #from backend.serializers import ESProductSerializer, AttributeSerializer
 from .es_models import VariantIndex
 from .validators import *
+from elasticsearch_dsl import Search
 
 
 class User(AbstractUser):
@@ -73,15 +74,19 @@ class Variant(models.Model):
     images = models.ManyToManyField(Image, related_name="variants", blank=True)
 
     def indexing(self):
+        attrs = []
+        for attr in self.attributes.all():
+            attrs.append(attr.id)
         obj = VariantIndex(
             id=self.id,
             name=self.name,
-            attributes=1,
+            attributes=attrs,
             product=self.product.id,
             price=self.price,
         )
         obj.save()
         return obj.to_dict(include_meta=True)
+
 
     def __str__(self):
         return self.name
