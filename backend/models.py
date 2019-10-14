@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+#from backend.serializers import ESProductSerializer, AttributeSerializer
 from .es_models import VariantIndex
 from .validators import *
 
@@ -72,14 +73,12 @@ class Variant(models.Model):
     images = models.ManyToManyField(Image, related_name="variants", blank=True)
 
     def indexing(self):
-        print(self.attributes)
         obj = VariantIndex(
-            meta={'id': self.id},
+            id=self.id,
             name=self.name,
-            attributes=self.attributes,
-            product=self.product,
+            attributes=1,
+            product=self.product.id,
             price=self.price,
-            body='',
         )
         obj.save()
         return obj.to_dict(include_meta=True)

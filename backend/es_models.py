@@ -8,34 +8,34 @@ connections.create_connection(hosts=['elasticsearch'])
 class AttributeValueIndex(InnerDoc):
     value = Text()
 
-class AttributeIndex(InnerDoc):
+class AttributeIndex(Document):
     name = Text()
     attribute_value = Nested(AttributeValueIndex)
 
+    class Index:
+        name = 'attributes'
 
-class ProductIndex(InnerDoc):
+
+class ProductIndex(Document):
     title = Text()
     slug = Text()
     featured = Boolean()
     image = Text()
 
+    class Index:
+        name = 'products'
+
 
 class VariantIndex(Document):
     name = Text()
-    attributes = Nested(AttributeIndex)
-    product = Nested(ProductIndex)
+    attributes = Integer()
+    product = Integer()
     price = Integer()
 
     class Index:
         name = 'variants'
-        settings = {
-          "number_of_shards": 1,
-          "number_of_replicas": 0,
-        }
-
-#    def save(self, **kwargs):
-#        self.lines = len(self.body.split())
-#        return super(Variant, self).save(**kwargs)
 
 
+AttributeIndex.init()
+ProductIndex.init()
 VariantIndex.init()

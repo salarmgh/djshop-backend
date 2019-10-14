@@ -20,3 +20,4 @@ class Command(BaseCommand):
             product = Product.objects.create(title=generate_random_string(5, 5), slug=generate_random_string(5, 5), featured=True, image=image)
             for i in range(10):
                 variant = Variant.objects.create(name=generate_random_string(5, 5), product=product, price=generate_random_number(5, 5))
+                variant.attributes.set(attributes)

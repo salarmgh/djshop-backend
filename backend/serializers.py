@@ -26,16 +26,17 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("id", "username", "first_name", "last_name", "email", "number", "addresses")
 
 
-class AttributeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Attribute
-        fields = ('id', 'name')
-
-
 class AttributeValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = AttributeValue
         fields = ('value', 'attribute')
+
+
+class AttributeSerializer(serializers.ModelSerializer):
+    attributes = AttributeValueSerializer(many=True, read_only=True)
+    class Meta:
+        model = Attribute
+        fields = ('id', 'name', 'attributes')
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -66,6 +67,12 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'title', 'description', 'image', 'created_at', 'categories', 'featured', 'variants', 'slug')
+
+
+class ESProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('id', 'title', 'featured', 'image')
 
 
 class CarouselSerializer(serializers.ModelSerializer):

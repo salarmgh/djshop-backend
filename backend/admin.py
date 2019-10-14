@@ -49,4 +49,6 @@ admin_site.register(Banner)
 admin_site.register(LandingBanner)
 admin_site.register(Order)
 admin_site.register(Cart)
+admin_site.register(Variant)
+admin_site.register(Product)
 

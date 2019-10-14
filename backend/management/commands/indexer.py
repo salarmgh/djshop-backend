@@ -9,5 +9,5 @@ class Command(BaseCommand):
     help = 'Index db to elasticsearch'
 
     def handle(self, *args, **options):
-        es = Elasticsearch()
+        es = Elasticsearch(["elasticsearch"])
         bulk(client=es, actions=(b.indexing() for b in Variant.objects.all().iterator()))
