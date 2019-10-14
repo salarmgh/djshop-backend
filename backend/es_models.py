@@ -5,37 +5,24 @@ from elasticsearch_dsl.connections import connections
 connections.create_connection(hosts=['elasticsearch'])
 
 
-class AttributeValueIndex(InnerDoc):
-    value = Text()
-
-class AttributeIndex(Document):
+class AttributeIndex(InnerDoc):
     name = Text()
-    attribute_value = Nested(AttributeValueIndex)
+    value = Text()
 
     class Index:
         name = 'attributes'
 
 
-class ProductIndex(Document):
-    title = Text()
-    slug = Text()
-    featured = Boolean()
-    image = Text()
-
-    class Index:
-        name = 'products'
-
-
 class VariantIndex(Document):
-    name = Text()
-    attributes = Integer()
+    attributes = Nested(AttributeIndex)
+    url = Text()
+    featured = Boolean()
     product = Integer()
     price = Integer()
+    image = Text()
 
     class Index:
         name = 'variants'
 
 
-AttributeIndex.init()
-ProductIndex.init()
 VariantIndex.init()

@@ -3,7 +3,6 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
-#from backend.serializers import ESProductSerializer, AttributeSerializer
 from .es_models import VariantIndex
 from .validators import *
 from elasticsearch_dsl import Search
@@ -43,6 +42,17 @@ class Product(models.Model):
     featured = models.BooleanField(default=False)
     image = models.ForeignKey(Image, related_name="products", on_delete=models.CASCADE, blank=True, null=True)
 
+    def indexing(self):
+        obj = ProductIndex(
+            meta={'id': self.id},
+            title=self.title,
+            slug=self.slug,
+            featured=self.featured,
+            image=self.image.image.url,
+        )
+        obj.save()
+        return obj.to_dict(include_meta=True)
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title, allow_unicode=True)
         super().save(*args, **kwargs)
@@ -75,14 +85,19 @@ class Variant(models.Model):
 
     def indexing(self):
         attrs = []
+        values = []
         for attr in self.attributes.all():
-            attrs.append(attr.id)
+            for value in attr.attributes.all():
+                values.append(value.value)
+            attrs.append({"name": attr.name, "value": values})
         obj = VariantIndex(
-            id=self.id,
-            name=self.name,
+            meta={'id': self.id},
+            name=self.product.title + " " + self.name,
             attributes=attrs,
-            product=self.product.id,
+            url=self.product.slug + "/apc-" + str(self.id) + "/",
+            featured=self.product.featured,
             price=self.price,
+            image=self.product.image.image.url,
         )
         obj.save()
         return obj.to_dict(include_meta=True)
