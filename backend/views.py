@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
-class ProductViewSet(viewsets.ViewSet, generics.ListAPIView):
+class ProductViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveModelMixin):
     """
     API endpoint that allows users to be viewed or edited.
     """

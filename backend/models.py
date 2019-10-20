@@ -9,8 +9,8 @@ from elasticsearch_dsl import Search
 
 
 class User(AbstractUser):
-    number = models.CharField(max_length=11, validators=[validate_phone_number], blank=True)
-    email = models.EmailField(_('email address'), blank=False, null=False)
+    number = models.CharField(max_length=11, validators=[validate_phone_number], blank=False, null=False)
+    # email = models.EmailField(_('email address'), blank=False, null=False)
 
     def clean(self, *args, **kwargs):
         validate_phone_number(self.number)
@@ -33,14 +33,29 @@ class Image(models.Model):
     def __str__(self):
         return self.title
 
+class Attribute(models.Model):
+    name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
+
+class AttributeValue(models.Model):
+    value = models.CharField(max_length=100)
+    attribute = models.ForeignKey(Attribute, related_name='attributes', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.value
+
+    
 class Product(models.Model):
     title = models.CharField(max_length=300, unique=True)
     description = models.TextField()
     slug = models.SlugField(allow_unicode=True, unique=True)
     created_at = models.DateTimeField(auto_now=True)
     featured = models.BooleanField(default=False)
-    image = models.ForeignKey(Image, related_name="products", on_delete=models.CASCADE, blank=True, null=True)
+    attributes = models.ManyToManyField(Attribute, related_name='products')
+ 
 
     def indexing(self):
         obj = ProductIndex(
@@ -62,23 +77,10 @@ class Product(models.Model):
         return self.title
 
 
-class Attribute(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
-class AttributeValue(models.Model):
-    value = models.CharField(max_length=100)
-    attribute = models.ForeignKey(Attribute, related_name='attributes', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.value
 
 class Variant(models.Model):
     name = models.CharField(max_length=200)
-    attributes = models.ManyToManyField(Attribute, related_name="variants")
+    attributes = models.ManyToManyField(Attribute, related_name="variants", blank=True)
     product = models.ForeignKey(Product, related_name='variants', blank=True, on_delete=models.CASCADE)
     price = models.PositiveIntegerField(default=0)
     images = models.ManyToManyField(Image, related_name="variants", blank=True)

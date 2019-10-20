@@ -165,3 +165,16 @@ BANNER_IMAGES_DIR = 'images/banners/'
 LANDING_IMAGES_DIR = 'images/banners/'
 
 JET_DEFAULT_THEME = 'light-gray'
+
+JET_SIDE_MENU_COMPACT = True
+
+JET_SIDE_MENU_ITEMS = [
+    {
+        'label': ('Anemone'),
+        'app_label': 'backend',
+        'items': [
+            {'name': 'user'},
+            {'name': 'product'}
+        ]
+    }
+]
