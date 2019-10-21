@@ -174,7 +174,9 @@ JET_SIDE_MENU_ITEMS = [
         'app_label': 'backend',
         'items': [
             {'name': 'user'},
-            {'name': 'product'}
+            {'name': 'product'},
+            {'name': 'attribute'},
+            {'name': 'category'}
         ]
     }
 ]

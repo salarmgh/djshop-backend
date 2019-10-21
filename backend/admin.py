@@ -20,6 +20,9 @@ class AddressInline(admin.StackedInline):
     model = Address
     extra = 1
 
+class CategoryProductInline(admin.StackedInline):
+    model = Category.products.through
+    extra = 3
 
 class ImageInline(admin.StackedInline):
     model = Image
@@ -43,6 +46,13 @@ class ProductCategoryInline(admin.StackedInline):
     extra = 1
     verbose_name = "Categories"
     verbose_name_plural = "Categories"
+
+    
+class AttributeValueInline(admin.StackedInline):
+    model = AttributeValue
+    extra = 3
+    verbose_name = "Attributes"
+    verbose_name_plural = "Attribute"
 
 
 class UserForm(ModelForm):
@@ -79,16 +89,21 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductAttributeInline, ProductVariantsInline, ProductCategoryInline]
     form = ProductForm
     readonly_fields=('created_at','url',)
+    
 
+class AttributeAdmin(admin.ModelAdmin):
+    inlines = [AttributeValueInline]
+
+class CategoryAdmin(admin.ModelAdmin):
+    inlines = [CategoryProductInline]
     
 admin_site = AdminSite()
 
 admin_site.register(User, UserAdmin)
 admin_site.register(Product, ProductAdmin)
+admin_site.register(Attribute, AttributeAdmin)
+admin_site.register(Category, CategoryAdmin)
 
-admin_site.register(Image)
-admin_site.register(Category)
-admin_site.register(Attribute)
 admin_site.register(AttributeValue)
 admin_site.register(Carousel)
 admin_site.register(Banner)
