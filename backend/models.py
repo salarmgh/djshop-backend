@@ -10,8 +10,7 @@ from elasticsearch_dsl import Search
 
 class User(AbstractUser):
     number = models.CharField(max_length=11, validators=[validate_phone_number], blank=False, null=False)
-    # email = models.EmailField(_('email address'), blank=False, null=False)
-
+    
     def clean(self, *args, **kwargs):
         validate_phone_number(self.number)
         super().clean(*args, **kwargs)
@@ -54,7 +53,6 @@ class Product(models.Model):
     slug = models.SlugField(allow_unicode=True, unique=True)
     created_at = models.DateTimeField(auto_now=True)
     featured = models.BooleanField(default=False)
-    attributes = models.ManyToManyField(Attribute, related_name='products')
  
 
     def indexing(self):
@@ -80,7 +78,7 @@ class Product(models.Model):
 
 class Variant(models.Model):
     name = models.CharField(max_length=200)
-    attributes = models.ManyToManyField(Attribute, related_name="variants", blank=True)
+    attribute_values = models.ManyToManyField(AttributeValue, related_name="variants", blank=True)
     product = models.ForeignKey(Product, related_name='variants', blank=True, on_delete=models.CASCADE)
     price = models.PositiveIntegerField(default=0)
     images = models.ManyToManyField(Image, related_name="variants", blank=True)

@@ -3,7 +3,7 @@ from django.contrib.admin import AdminSite
 from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
 from .models import *
-from django.forms import ModelForm, PasswordInput, CharField
+from django.forms import ModelForm, PasswordInput, CharField, Form, BooleanField, Textarea, EmailField
 from django.utils.safestring import mark_safe
 
 
@@ -24,18 +24,27 @@ class AddressInline(admin.StackedInline):
 class CategoryProductInline(admin.StackedInline):
     model = Category.products.through
     extra = 3
-    
+    verbose_name = "Products"
+    verbose_name_plural = "Products"
+
+
+class CategoryAttributeInline(admin.StackedInline):
+    model = Category.attributes.through
+    verbose_name = "Attributes"
+    verbose_name_plural = "Attributes"
+    extra = 3
+
 
 class ImageInline(admin.StackedInline):
     model = Image
     extra = 3
     
 
-class ProductAttributeInline(admin.StackedInline):
-    model = Product.attributes.through
-    extra = 3
-    verbose_name = "Attributes"
-    verbose_name_plural = "Attributes"
+# class ProductAttributeInline(admin.StackedInline):
+#     model = Product.attributes.through
+#     extra = 3
+#     verbose_name = "Attributes"
+#     verbose_name_plural = "Attributes"
 
 
 class ProductVariantsInline(admin.StackedInline):
@@ -97,7 +106,7 @@ class ProductAdmin(admin.ModelAdmin):
         return mark_safe('<a href="/products/{}/">{}</a>'.format(obj.slug, obj.title))
 
 
-    inlines = [ProductAttributeInline, ProductVariantsInline, ProductCategoryInline]
+    inlines = [ProductVariantsInline, ProductCategoryInline]
     form = ProductForm
     readonly_fields=('created_at','url',)
     
@@ -110,10 +119,12 @@ class CategoryAdmin(admin.ModelAdmin):
     def url(self, obj):
         return mark_safe('<a href="/categories/{}/">{}</a>'.format(obj.slug, obj.name))
     
-    inlines = [CategoryProductInline]
+    inlines = [CategoryAttributeInline, CategoryProductInline]
     form = CategoryForm
-    readonly_fields=('url')
+    readonly_fields=('url',)
 
+    class Meta:
+        model = Category
 
 admin_site = AdminSite()
 
@@ -129,4 +140,4 @@ admin_site.register(LandingBanner)
 admin_site.register(Order)
 admin_site.register(Cart)
 admin_site.register(Variant)
-
+#admin_site.register(Category, CustomAdmin)
