@@ -20,7 +20,7 @@ class ProductViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveMode
     lookup_field = 'slug'
 
 
-class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
+class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveModelMixin):
     """
     API endpoint that allows users to be viewed or edited.
     """

@@ -19,14 +19,17 @@ class AdminSite(AdminSite):
 class AddressInline(admin.StackedInline):
     model = Address
     extra = 1
+    
 
 class CategoryProductInline(admin.StackedInline):
     model = Category.products.through
     extra = 3
+    
 
 class ImageInline(admin.StackedInline):
     model = Image
     extra = 3
+    
 
 class ProductAttributeInline(admin.StackedInline):
     model = Product.attributes.through
@@ -40,6 +43,7 @@ class ProductVariantsInline(admin.StackedInline):
     extra = 3
     verbose_name = "Variants"
     verbose_name_plural = "Variants"
+    
     
 class ProductCategoryInline(admin.StackedInline):
     model = Product.categories.through
@@ -80,6 +84,13 @@ class ProductForm(ModelForm):
         model = Product
         fields = ('title', 'description', 'featured',)
 
+class CategoryForm(ModelForm):
+    url = CharField()
+    
+    class Meta:
+        model = Category
+        fields = ('name', 'image',)
+
 
 class ProductAdmin(admin.ModelAdmin):
     def url(self, obj):
@@ -94,9 +105,16 @@ class ProductAdmin(admin.ModelAdmin):
 class AttributeAdmin(admin.ModelAdmin):
     inlines = [AttributeValueInline]
 
+
 class CategoryAdmin(admin.ModelAdmin):
-    inlines = [CategoryProductInline]
+    def url(self, obj):
+        return mark_safe('<a href="/categories/{}/">{}</a>'.format(obj.slug, obj.name))
     
+    inlines = [CategoryProductInline]
+    form = CategoryForm
+    readonly_fields=('url')
+
+
 admin_site = AdminSite()
 
 admin_site.register(User, UserAdmin)
