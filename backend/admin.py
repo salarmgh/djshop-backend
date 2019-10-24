@@ -5,6 +5,8 @@ from django.http import HttpResponse
 from .models import *
 from django.forms import ModelForm, PasswordInput, CharField, Form, BooleanField, Textarea, EmailField
 from django.utils.safestring import mark_safe
+from django.forms.models import BaseInlineFormSet
+from django.contrib.admin.options import flatten_fieldsets
 
 
 class AdminSite(AdminSite):
@@ -21,11 +23,11 @@ class AddressInline(admin.StackedInline):
     extra = 1
     
 
-class CategoryProductInline(admin.StackedInline):
-    model = Category.products.through
-    extra = 3
-    verbose_name = "Products"
-    verbose_name_plural = "Products"
+# class CategoryProductInline(admin.StackedInline):
+#     model = Category.products.through
+#     extra = 3
+#     verbose_name = "Products"
+#     verbose_name_plural = "Products"
 
 
 class CategoryAttributeInline(admin.StackedInline):
@@ -33,32 +35,53 @@ class CategoryAttributeInline(admin.StackedInline):
     verbose_name = "Attributes"
     verbose_name_plural = "Attributes"
     extra = 3
+    
 
 
 class ImageInline(admin.StackedInline):
     model = Image
     extra = 3
+
+class ProductVariantsForm(ModelForm):
     
+    class Meta:
+        model = Variant
+        fields = ('name', 'attribute_values', 'product', 'price', 'images',)
+        
+    def __init__(self, *args, **kwargs):
 
-# class ProductAttributeInline(admin.StackedInline):
-#     model = Product.attributes.through
-#     extra = 3
-#     verbose_name = "Attributes"
-#     verbose_name_plural = "Attributes"
+        super().__init__(*args, **kwargs)
+        self.fields['test'] = CharField(label='test')
 
-
+        
 class ProductVariantsInline(admin.StackedInline):
     model = Variant
+    form = ProductVariantsForm
     extra = 3
     verbose_name = "Variants"
     verbose_name_plural = "Variants"
+
+
+    
+    # def get_fieldsets(self, request, obj=None):
+    #     # if self.declared_fieldsets:
+    #     #     return self.declared_fieldsets
+
+    #     form = self.get_formset(request, obj)(instance=obj)
+    #     return [(None, {'fields': form.fields.keys()})]
+
+    # def get_queryset(self, request):
+    #     qs = super().get_queryset(request)
+    #     category_attributes = qs.all()[0].product.category.attributes.all()
+    #     attributes = Attribute.objects.filter(pk__in=category_attributes)
+    #     return attributes
     
     
-class ProductCategoryInline(admin.StackedInline):
-    model = Product.categories.through
-    extra = 1
-    verbose_name = "Categories"
-    verbose_name_plural = "Categories"
+# class ProductCategoryInline(admin.StackedInline):
+#     model = Product.categories.through
+#     extra = 1
+#     verbose_name = "Categories"
+#     verbose_name_plural = "Categories"
 
     
 class AttributeValueInline(admin.StackedInline):
@@ -91,8 +114,9 @@ class ProductForm(ModelForm):
     
     class Meta:
         model = Product
-        fields = ('title', 'description', 'featured',)
+        fields = ('title', 'description', 'featured', 'category',)
 
+        
 class CategoryForm(ModelForm):
     url = CharField()
     
@@ -106,7 +130,7 @@ class ProductAdmin(admin.ModelAdmin):
         return mark_safe('<a href="/products/{}/">{}</a>'.format(obj.slug, obj.title))
 
 
-    inlines = [ProductVariantsInline, ProductCategoryInline]
+    inlines = [ProductVariantsInline]
     form = ProductForm
     readonly_fields=('created_at','url',)
     
@@ -119,7 +143,7 @@ class CategoryAdmin(admin.ModelAdmin):
     def url(self, obj):
         return mark_safe('<a href="/categories/{}/">{}</a>'.format(obj.slug, obj.name))
     
-    inlines = [CategoryAttributeInline, CategoryProductInline]
+    inlines = [CategoryAttributeInline]
     form = CategoryForm
     readonly_fields=('url',)
 

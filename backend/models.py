@@ -46,6 +46,20 @@ class AttributeValue(models.Model):
     def __str__(self):
         return self.value
 
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(allow_unicode=True, unique=True)
+    image = models.ImageField(upload_to=settings.CATEGORY_IMAGES_DIR, blank=True)
+    attributes = models.ManyToManyField(Attribute, related_name="categories")
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+    
     
 class Product(models.Model):
     title = models.CharField(max_length=300, unique=True)
@@ -53,6 +67,8 @@ class Product(models.Model):
     slug = models.SlugField(allow_unicode=True, unique=True)
     created_at = models.DateTimeField(auto_now=True)
     featured = models.BooleanField(default=False)
+    category = models.ForeignKey(Category, related_name="products", on_delete=models.CASCADE)
+#    attributes = models.ManyToManyField(Attribute, related_name="products")
  
 
     def indexing(self):
@@ -107,19 +123,6 @@ class Variant(models.Model):
         return self.name
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    products = models.ManyToManyField(Product, related_name='categories', blank=True)
-    slug = models.SlugField(allow_unicode=True, unique=True)
-    image = models.ImageField(upload_to=settings.CATEGORY_IMAGES_DIR, blank=True)
-    attributes = models.ManyToManyField(Attribute, related_name="categories")
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name, allow_unicode=True)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
 
 
 class Carousel(models.Model):
