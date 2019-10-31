@@ -9,8 +9,9 @@ from elasticsearch_dsl import Search
 
 
 class User(AbstractUser):
-    number = models.CharField(max_length=11, validators=[validate_phone_number], blank=False, null=False)
-    
+    number = models.CharField(max_length=11, validators=[
+                              validate_phone_number], blank=False, null=False)
+
     def clean(self, *args, **kwargs):
         validate_phone_number(self.number)
         super().clean(*args, **kwargs)
@@ -22,7 +23,8 @@ class User(AbstractUser):
 
 class Address(models.Model):
     location = models.TextField()
-    user = models.ForeignKey(User, related_name="addresses", on_delete=models.CASCADE, blank=True)
+    user = models.ForeignKey(
+        User, related_name="addresses", on_delete=models.CASCADE, blank=True)
 
 
 class Image(models.Model):
@@ -31,6 +33,7 @@ class Image(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class Attribute(models.Model):
     name = models.CharField(max_length=100)
@@ -41,7 +44,8 @@ class Attribute(models.Model):
 
 class AttributeValue(models.Model):
     value = models.CharField(max_length=100)
-    attribute = models.ForeignKey(Attribute, related_name='attributes', on_delete=models.CASCADE)
+    attribute = models.ForeignKey(
+        Attribute, related_name='attributes', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.value
@@ -50,7 +54,8 @@ class AttributeValue(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(allow_unicode=True, unique=True)
-    image = models.ImageField(upload_to=settings.CATEGORY_IMAGES_DIR, blank=True)
+    image = models.ImageField(
+        upload_to=settings.CATEGORY_IMAGES_DIR, blank=True)
     attributes = models.ManyToManyField(Attribute, related_name="categories")
 
     def save(self, *args, **kwargs):
@@ -59,17 +64,17 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-    
-    
+
+
 class Product(models.Model):
     title = models.CharField(max_length=300, unique=True)
     description = models.TextField()
     slug = models.SlugField(allow_unicode=True, unique=True)
     created_at = models.DateTimeField(auto_now=True)
     featured = models.BooleanField(default=False)
-    category = models.ForeignKey(Category, related_name="products", on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        Category, related_name="products", on_delete=models.CASCADE)
 #    attributes = models.ManyToManyField(Attribute, related_name="products")
- 
 
     def indexing(self):
         obj = ProductIndex(
@@ -86,16 +91,16 @@ class Product(models.Model):
         self.slug = slugify(self.title, allow_unicode=True)
         super().save(*args, **kwargs)
 
-
     def __str__(self):
         return self.title
 
 
-
 class Variant(models.Model):
     name = models.CharField(max_length=200)
-    attribute_values = models.ManyToManyField(AttributeValue, related_name="variants", blank=True)
-    product = models.ForeignKey(Product, related_name='variants', blank=True, on_delete=models.CASCADE)
+    attribute_values = models.ManyToManyField(
+        AttributeValue, related_name="variants", blank=True)
+    product = models.ForeignKey(
+        Product, related_name='variants', blank=True, on_delete=models.CASCADE)
     price = models.PositiveIntegerField(default=0)
     images = models.ManyToManyField(Image, related_name="variants", blank=True)
 
@@ -118,11 +123,8 @@ class Variant(models.Model):
         obj.save()
         return obj.to_dict(include_meta=True)
 
-
     def __str__(self):
         return self.name
-
-
 
 
 class Carousel(models.Model):
@@ -159,15 +161,19 @@ class LandingBanner(models.Model):
 
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, related_name="carts", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="carts",
+                             on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
 
 
 class Order(models.Model):
-    variant = models.ForeignKey(Variant, related_name="orders", on_delete=models.CASCADE)
+    variant = models.ForeignKey(
+        Variant, related_name="orders", on_delete=models.CASCADE)
     count = models.IntegerField(default=1)
-    user = models.ForeignKey(User, related_name="orders", on_delete=models.CASCADE)
-    cart = models.ForeignKey(Cart, related_name="orders", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, related_name="orders", on_delete=models.CASCADE)
+    cart = models.ForeignKey(
+        Cart, related_name="orders", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
