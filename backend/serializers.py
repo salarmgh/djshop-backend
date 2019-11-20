@@ -23,7 +23,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "username", "first_name", "last_name", "email", "number", "addresses")
+        fields = ("id", "username", "first_name",
+                  "last_name", "email", "number", "addresses")
 
 
 class AttributeValueSerializer(serializers.ModelSerializer):
@@ -34,6 +35,7 @@ class AttributeValueSerializer(serializers.ModelSerializer):
 
 class AttributeSerializer(serializers.ModelSerializer):
     attributes = AttributeValueSerializer(many=True, read_only=True)
+
     class Meta:
         model = Attribute
         fields = ('id', 'name', 'attributes')
@@ -51,22 +53,36 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'attributes')
 
 
-class VariantSerializer(serializers.ModelSerializer):
-    attributes = AttributeSerializer(many=True, read_only=True)
-    images = AttributeSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Variant
-        fields = ('id', 'name', 'attributes', 'product', 'price', 'images')
-
-
 class ProductSerializer(serializers.ModelSerializer):
-    variants = VariantSerializer(many=True, read_only=True)
     categories = CategorySerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
-        fields = ('id', 'title', 'description', 'created_at', 'categories', 'featured', 'variants', 'slug')
+        fields = ('id', 'title', 'description', 'created_at',
+                  'categories', 'featured', 'variants', 'slug')
+
+
+class VariantSerializer(serializers.ModelSerializer):
+    attribute_values = AttributeValueSerializer(many=True, read_only=True)
+    images = ImageSerializer(many=True, read_only=True)
+    product = ProductSerializer(many=False, read_only=True)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["product"].pop("variants")
+        attribute_values = data.pop("attribute_values")
+        attributes_with_value = []
+        for attr in attribute_values:
+            attribute = Attribute.objects.get(pk=attr["attribute"])
+            attributes_with_value.append(
+                {"name": attribute.name, "value": attr["value"]})
+        data["attributes"] = attributes_with_value
+        return data
+
+    class Meta:
+        model = Variant
+        fields = ('id', 'name', 'attribute_values',
+                  'product', 'price', 'images')
 
 
 class ESProductSerializer(serializers.ModelSerializer):

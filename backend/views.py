@@ -115,7 +115,7 @@ class CartViewSet(viewsets.ModelViewSet):
     serializer_class = CartSerializer
 
 
-class VariantViewSet(viewsets.ViewSet, generics.ListAPIView):
+class VariantViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveModelMixin):
     """
     API endpoint that allows users to be viewed or edited.
     """
