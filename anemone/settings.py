@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl_drf',
     'backend',
 ]
 
@@ -59,7 +61,7 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
-        'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
@@ -119,9 +121,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-#CORS_ORIGIN_WHITELIST = (
+# CORS_ORIGIN_WHITELIST = (
 #    'localhost:8080',
-#)
+# )
 
 CORS_ORIGIN_WHITELIST = [
     "http://localhost",
@@ -149,6 +151,12 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'elasticsearch:9200'
+    },
+}
 
 
 # Static files (CSS, JavaScript, Images)

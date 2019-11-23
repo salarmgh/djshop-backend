@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from .models import *
 from django.utils.text import slugify
-from pprint import pprint
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.fields import empty
+import json
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -131,3 +132,14 @@ class TokenObtainSerializer(TokenObtainPairSerializer):
         token["number"] = user.number
 
         return token
+
+
+class VariantDocumentSerializer(DocumentSerializer):
+    """Serializer for Variant document."""
+
+    class Meta(object):
+        fields = (
+            'id',
+            'name',
+            'price',
+        )

@@ -9,6 +9,16 @@ from rest_framework import mixins
 from pprint import pprint
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django_elasticsearch_dsl_drf.filter_backends import (
+    FilteringFilterBackend,
+    OrderingFilterBackend,
+    SearchFilterBackend,
+    DefaultOrderingFilterBackend,
+)
+from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
+
+from backend.documents.variant import VariantDocument
+from backend.serializers import VariantDocumentSerializer
 
 
 class ProductViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveModelMixin):
@@ -154,3 +164,30 @@ class CreateOrderViewSet(viewsets.ViewSet):
         cart.save()
         cart.orders.set(orders)
         return Response()
+
+
+class VariantDocumentView(DocumentViewSet):
+    """The VariantDocument view."""
+
+    document = VariantDocument
+    serializer_class = VariantDocumentSerializer
+    lookup_field = 'id'
+    filter_backends = [
+        FilteringFilterBackend,
+        OrderingFilterBackend,
+        DefaultOrderingFilterBackend,
+        SearchFilterBackend,
+    ]
+    search_fields = (
+        'name',
+        'price',
+    )
+    filter_fields = {
+        'id': None,
+        'name': 'name.raw',
+    }
+    ordering_fields = {
+        'id': None,
+        'name': None,
+    }
+    ordering = ('id', 'name',)
