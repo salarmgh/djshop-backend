@@ -9,3 +9,4 @@ pillow==6.2.0
 elasticsearch-dsl==7.1.0
 django-elasticsearch-dsl==7.1.0
 django-elasticsearch-dsl-drf==0.20.3
+celery==4.3.0
