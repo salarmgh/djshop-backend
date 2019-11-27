@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'django_elasticsearch_dsl',
-    'django_elasticsearch_dsl_drf',
     'backend',
 ]
 
@@ -193,3 +192,6 @@ JET_SIDE_MENU_ITEMS = [
         ]
     }
 ]
+
+# Celery
+CELERY_BROKER_URL = 'redis://redis:6379'

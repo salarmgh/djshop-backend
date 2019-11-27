@@ -1,27 +1,26 @@
-from django_elasticsearch_dsl import Document, Index, fields
-from elasticsearch_dsl import analyzer
+from elasticsearch_dsl import Document, InnerDoc, Nested, Long, Text
+from anemone.elasticsearch import connections
 
-from backend.models import Variant
-
-
-VARIANT_INDEX = Index('variants')
-VARIANT_INDEX.settings(
-    number_of_shards=1,
-    number_of_replicas=0
-)
+class AttributeDocument(InnerDoc):
+    name = Text()
+    value = Text()
 
 
-@VARIANT_INDEX.doc_type
 class VariantDocument(Document):
-    """Variant Elasticsearch document."""
+    name = Text()
+    price = Long()
+    product = []
+    attributes = Nested(AttributeDocument)
+    images = []
 
-    id = fields.IntegerField(attr='id')
+    def add_attribute(self, name, value):
+        self.attributes.append(AttributeDocument(name=name, value=value))
 
-    name = fields.TextField(fields={
-        'raw': fields.KeywordField()
-    }, fielddata=False)
+    class Index:
+        name = 'variants'
+        settings = {
+          "number_of_shards": 1,
+          "number_of_replicas": 0
+        }
 
-    price = fields.IntegerField(attr='price')
-
-    class Django(object):
-        model = Variant
+VariantDocument.init()

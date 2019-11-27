@@ -4,7 +4,7 @@ from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from .validators import *
-from elasticsearch_dsl import Search
+from .tasks import variant_model_indexer
 
 
 class User(AbstractUser):
@@ -103,6 +103,21 @@ class Variant(models.Model):
     price = models.PositiveIntegerField(default=0)
     images = models.ManyToManyField(Image, related_name="variants", blank=True)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        product = {"title": self.product.title, "description": self.product.description, "slug": self.product.slug, "created_at": self.product.created_at, "featured": self.product.featured, "category": self.product.category.name}
+
+        images = []
+        for image in self.images.all():
+            images.append(image.image.url)
+
+        attributes = []
+        for attribute in self.attribute_values.all():
+            attributes.append({"name": attribute.attribute.name, "value": attribute.value})
+            
+        variant = {"id": self.id, "name": self.name, "price": self.price, "product": product, "attributes": attributes, "images": images}
+        variant_model_indexer.delay(variant)
+ 
     def __str__(self):
         return self.name
 
