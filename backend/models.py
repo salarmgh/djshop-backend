@@ -7,6 +7,7 @@ from .validators import *
 from .tasks import variant_model_indexer
 
 
+
 class User(AbstractUser):
     number = models.CharField(max_length=11, validators=[
                               validate_phone_number], blank=False, null=False)
@@ -103,8 +104,7 @@ class Variant(models.Model):
     price = models.PositiveIntegerField(default=0)
     images = models.ManyToManyField(Image, related_name="variants", blank=True)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    def document(self):
         product = {"title": self.product.title, "description": self.product.description, "slug": self.product.slug, "created_at": self.product.created_at, "featured": self.product.featured, "category": self.product.category.name}
 
         images = []
@@ -115,9 +115,30 @@ class Variant(models.Model):
         for attribute in self.attribute_values.all():
             attributes.append({"name": attribute.attribute.name, "value": attribute.value})
             
-        variant = {"id": self.id, "name": self.name, "price": self.price, "product": product, "attributes": attributes, "images": images}
+        variant = {"id": self.id, "name": self.name, "price": self.price, "product": product, "attributes": attributes, "images": images, "category": self.product.category.name}
+        return variant
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        variant = self.document()
         variant_model_indexer.delay(variant)
- 
+
+
+    def indexing(self):
+        from .documents.variant import VariantDocument
+        variant = self.document()
+        document = VariantDocument(
+            meta={'id': variant["id"]},
+            name=variant["name"],
+            price=variant["price"],
+            product=variant["product"],
+            attributes=variant["attributes"],
+            category=variant["category"],
+            images=variant["images"]
+        )
+        
+        return document.to_dict(include_meta=True)
+
     def __str__(self):
         return self.name
 

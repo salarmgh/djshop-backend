@@ -1,0 +1,5 @@
+from anemone.elasticsearch import connections
+from elasticsearch_dsl import Search
+
+s = Search(using=connections.get_connection())
+s.filter("term", **{'category.keyword': 'جاسوییچی'}).execute()

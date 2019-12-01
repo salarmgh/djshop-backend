@@ -1,20 +1,14 @@
-from elasticsearch_dsl import Document, InnerDoc, Nested, Long, Text
+from elasticsearch_dsl import Document, Long, Text, Keyword
 from anemone.elasticsearch import connections
-
-class AttributeDocument(InnerDoc):
-    name = Text()
-    value = Text()
-
 
 class VariantDocument(Document):
     name = Text()
+    category = Text(fields={'keyword': Keyword()})
     price = Long()
     product = []
-    attributes = Nested(AttributeDocument)
+    attributes = []
     images = []
 
-    def add_attribute(self, name, value):
-        self.attributes.append(AttributeDocument(name=name, value=value))
 
     class Index:
         name = 'variants'
@@ -23,4 +17,3 @@ class VariantDocument(Document):
           "number_of_replicas": 0
         }
 
-VariantDocument.init()
