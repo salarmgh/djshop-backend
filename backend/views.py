@@ -9,12 +9,6 @@ from rest_framework import mixins
 from pprint import pprint
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
-from django_elasticsearch_dsl_drf.filter_backends import (
-    FilteringFilterBackend,
-    OrderingFilterBackend,
-    SearchFilterBackend,
-    DefaultOrderingFilterBackend,
-)
 
 
 
