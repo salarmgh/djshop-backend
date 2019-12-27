@@ -10,7 +10,7 @@ from pprint import pprint
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from elasticsearch_dsl import Search
-
+from elasticsearch_dsl.query import MultiMatch
 
 
 class ProductViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveModelMixin):
@@ -133,9 +133,13 @@ class SearchViewSet(viewsets.ViewSet):
     def list(self, request):
         from anemone.elasticsearch import connections
         client = connections.get_connection()
-        s = Search(using=client, index="variants").query("match_all")
-        data = s.execute()
-        return Response(data.to_dict()["hits"])
+        search = Search(using=connections.get_connection(), index="variants")
+        multi_match = MultiMatch(query='gold', fields=['name', 'product.title', 'product.description'])
+        filter = search.filter('term', product__category__keyword='Necklace')
+        query = filter.query(multi_match)
+
+        result = query.execute()
+        return Response(result.to_dict()["hits"]["hits"])
 
 class CreateOrderViewSet(viewsets.ViewSet):
     def create(self, request):
