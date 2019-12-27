@@ -20,4 +20,5 @@ router.register(r'users', UserViewSet)
 router.register(r'orders', OrderViewSet)
 router.register(r'cart', CartViewSet)
 router.register(r'create-order', CreateOrderViewSet, basename="create-order")
+router.register(r'search', SearchViewSet, basename="search")
 

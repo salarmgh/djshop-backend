@@ -9,6 +9,7 @@ from rest_framework import mixins
 from pprint import pprint
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
+from elasticsearch_dsl import Search
 
 
 
@@ -127,6 +128,14 @@ class VariantViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveMode
 class TokenObtainView(TokenObtainPairView):
     serializer_class = TokenObtainSerializer
 
+
+class SearchViewSet(viewsets.ViewSet):
+    def list(self, request):
+        from anemone.elasticsearch import connections
+        client = connections.get_connection()
+        s = Search(using=client, index="variants").query("match_all")
+        data = s.execute()
+        return Response(data.to_dict()["hits"])
 
 class CreateOrderViewSet(viewsets.ViewSet):
     def create(self, request):
