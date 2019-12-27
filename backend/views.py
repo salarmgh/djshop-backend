@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import MultiMatch
+from elasticsearch_dsl import Q
 
 
 class ProductViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveModelMixin):
@@ -134,12 +135,20 @@ class SearchViewSet(viewsets.ViewSet):
         from anemone.elasticsearch import connections
         client = connections.get_connection()
         search = Search(using=connections.get_connection(), index="variants")
-        multi_match = MultiMatch(query='gold', fields=['name', 'product.title', 'product.description'])
+        #multi_match = MultiMatch(query='gold', fields=['name', 'product.title', 'product.description'])
+
+        multi_match = Q('bool', must=[Q('multi_match', query="gold", fields=['name', 'product.title', 'product.description']), Q('range', price={'gte': 10})])
+        
         filter = search.filter('term', product__category__keyword='Necklace')
         query = filter.query(multi_match)
+        print(query.to_dict())
 
         result = query.execute()
         return Response(result.to_dict()["hits"]["hits"])
+
+class GetCategoryAttributes(viewsets.ViewSet, mixins.RetrieveModelMixin):
+    queryset = Category.objects.all()
+    serializer_class = GetCategoryAttributesSerializer()
 
 class CreateOrderViewSet(viewsets.ViewSet):
     def create(self, request):
