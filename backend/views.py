@@ -12,6 +12,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import MultiMatch
 from elasticsearch_dsl import Q
+from rest_framework.decorators import action
 
 
 class ProductViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveModelMixin):
@@ -31,6 +32,7 @@ class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveMod
     serializer_class = CategorySerializer
     lookup_field = 'slug'
 
+        
 
 class AttributeViewSet(viewsets.ViewSet, generics.ListAPIView):
     """
@@ -88,7 +90,6 @@ class FeaturedProductViewSet(viewsets.ViewSet, generics.ListAPIView):
     API endpoint that allows users to be viewed or edited.
     """
     serializer_class = ProductSerializer
-
     def get_queryset(self):
         products = Product.objects.filter(featured=True)
         return products
@@ -131,24 +132,67 @@ class TokenObtainView(TokenObtainPairView):
 
 
 class SearchViewSet(viewsets.ViewSet):
+    def attributes_query_builder(self, search, query):
+        attributes_query = []
+        
+        for match in query:
+            attributes_query.append(Q('match', attributes__name=match.split('|')[0]))
+            attributes_query.append(Q('match', attributes__value=match.split('|')[1]))
+        return Q('bool', must=attributes_query)
+    
+    def category_query_builder(self, search, categories):
+        category = search.filter('term', product__category__keyword=categories)
+        return category
+
+    def search(self, query, fields):
+        query = Q('multi_match', query=query, fields=fields)
+        
+        return query
+
+    def price_filter(self, price):
+        search_price = {}
+        if price["min"]:
+            search_price['gte'] = price["min"]
+        if price["max"]:
+            search_price['lte'] = price["max"]
+            
+        query = Q('range', price=search_price)
+        return query
+    
     def list(self, request):
         from anemone.elasticsearch import connections
-        client = connections.get_connection()
-        search = Search(using=connections.get_connection(), index="variants")
-        #multi_match = MultiMatch(query='gold', fields=['name', 'product.title', 'product.description'])
 
-        multi_match = Q('bool', must=[Q('multi_match', query="gold", fields=['name', 'product.title', 'product.description']), Q('range', price={'gte': 10})])
+        categories = self.request.query_params.get('categories')
+        search_text = self.request.query_params.get('q')
         
-        filter = search.filter('term', product__category__keyword='Necklace')
-        query = filter.query(multi_match)
-        print(query.to_dict())
+        min_price = self.request.query_params.get('min_price', None)
+        max_price = self.request.query_params.get('max_price', None)
 
-        result = query.execute()
+        attributes_filter = self.request.query_params.getlist('attribute')
+        
+        client = connections.get_connection()
+        context = Search(using=connections.get_connection(), index="variants")
+        
+        
+
+        if categories:
+            context = self.category_query_builder(context, categories)
+
+        attributes = self.attributes_query_builder(context, attributes_filter)
+        context = context.query(attributes)
+
+        if search_text:
+            query = self.search(search_text, ['name', 'product.title', 'product.description'])
+            context = context.query(query)
+        
+        if min_price or max_price:
+            query = self.price_filter({"max": max_price, "min": min_price})
+            context = context.query(query)
+
+                
+        result = context.execute()
         return Response(result.to_dict()["hits"]["hits"])
-
-class GetCategoryAttributes(viewsets.ViewSet, mixins.RetrieveModelMixin):
-    queryset = Category.objects.all()
-    serializer_class = GetCategoryAttributesSerializer()
+        
 
 class CreateOrderViewSet(viewsets.ViewSet):
     def create(self, request):

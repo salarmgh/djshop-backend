@@ -136,7 +136,7 @@ class Variant(models.Model):
             category=variant["category"],
             images=variant["images"]
         )
-        
+
         return document.to_dict(include_meta=True)
 
     def __str__(self):

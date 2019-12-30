@@ -1,5 +1,6 @@
-from elasticsearch_dsl import Document, Long, Text, Keyword
+from elasticsearch_dsl import Document, Long, Text, Keyword, Nested, InnerDoc
 from anemone.elasticsearch import connections
+
 
 class VariantDocument(Document):
     name = Text()
