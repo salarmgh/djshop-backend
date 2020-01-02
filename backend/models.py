@@ -7,10 +7,10 @@ from .validators import *
 from .tasks import variant_model_indexer
 
 
-
 class User(AbstractUser):
     number = models.CharField(max_length=11, validators=[
                               validate_phone_number], blank=False, null=False)
+    folan = [1, 2, 3]
 
     def clean(self, *args, **kwargs):
         validate_phone_number(self.number)
@@ -105,7 +105,8 @@ class Variant(models.Model):
     images = models.ManyToManyField(Image, related_name="variants", blank=True)
 
     def document(self):
-        product = {"title": self.product.title, "description": self.product.description, "slug": self.product.slug, "created_at": self.product.created_at, "featured": self.product.featured, "category": self.product.category.name}
+        product = {"title": self.product.title, "description": self.product.description, "slug": self.product.slug,
+                   "created_at": self.product.created_at, "featured": self.product.featured, "category": self.product.category.name}
 
         images = []
         for image in self.images.all():
@@ -113,16 +114,17 @@ class Variant(models.Model):
 
         attributes = []
         for attribute in self.attribute_values.all():
-            attributes.append({"name": attribute.attribute.name, "value": attribute.value})
-            
-        variant = {"id": self.id, "name": self.name, "price": self.price, "product": product, "attributes": attributes, "images": images, "category": self.product.category.name}
+            attributes.append(
+                {"name": attribute.attribute.name, "value": attribute.value})
+
+        variant = {"id": self.id, "name": self.name, "price": self.price, "product": product,
+                   "attributes": attributes, "images": images, "category": self.product.category.name}
         return variant
-    
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         variant = self.document()
         variant_model_indexer.delay(variant)
-
 
     def indexing(self):
         from .documents.variant import VariantDocument
