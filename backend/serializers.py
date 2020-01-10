@@ -49,11 +49,11 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     attributes = AttributeSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = Category
         fields = ('id', 'name', 'image', 'attributes')
-        
+
 
 class ProductSerializer(serializers.ModelSerializer):
     categories = CategorySerializer(many=True, read_only=True)
@@ -61,7 +61,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'title', 'description', 'created_at',
-                  'categories', 'featured', 'variants', 'slug')
+                  'categories', 'variants', 'slug')
 
 
 class VariantSerializer(serializers.ModelSerializer):
@@ -108,7 +108,7 @@ class BannerSerializer(serializers.ModelSerializer):
 class LandingBannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = LandingBanner
-        fields = ('id', 'title', 'description' 'image', 'url', 'created_at')
+        fields = ('id', 'title', 'description', 'image', 'url', 'created_at')
 
 
 class OrderSerializer(serializers.ModelSerializer):

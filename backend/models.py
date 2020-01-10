@@ -10,7 +10,6 @@ from .tasks import variant_model_indexer
 class User(AbstractUser):
     number = models.CharField(max_length=11, validators=[
                               validate_phone_number], blank=False, null=False)
-    folan = [1, 2, 3]
 
     def clean(self, *args, **kwargs):
         validate_phone_number(self.number)
@@ -69,27 +68,20 @@ class Category(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=300, unique=True)
     description = models.TextField()
-    slug = models.SlugField(allow_unicode=True, unique=True)
     created_at = models.DateTimeField(auto_now=True)
-    featured = models.BooleanField(default=False)
+
     category = models.ForeignKey(
         Category, related_name="products", on_delete=models.CASCADE)
-#    attributes = models.ManyToManyField(Attribute, related_name="products")
 
     def indexing(self):
         obj = ProductIndex(
             meta={'id': self.id},
             title=self.title,
-            slug=self.slug,
             featured=self.featured,
             image=self.image.image.url,
         )
         obj.save()
         return obj.to_dict(include_meta=True)
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.title, allow_unicode=True)
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
@@ -103,10 +95,12 @@ class Variant(models.Model):
         Product, related_name='variants', blank=True, on_delete=models.CASCADE)
     price = models.PositiveIntegerField(default=0)
     images = models.ManyToManyField(Image, related_name="variants", blank=True)
+    featured = models.BooleanField(default=False)
+    slug = models.SlugField(allow_unicode=True, unique=True)
 
     def document(self):
-        product = {"title": self.product.title, "description": self.product.description, "slug": self.product.slug,
-                   "created_at": self.product.created_at, "featured": self.product.featured, "category": self.product.category.name}
+        product = {"title": self.product.title, "description": self.product.description, "slug": self.slug,
+                   "created_at": self.product.created_at, "featured": self.featured, "category": self.product.category.name}
 
         images = []
         for image in self.images.all():
@@ -122,6 +116,9 @@ class Variant(models.Model):
         return variant
 
     def save(self, *args, **kwargs):
+        print(slugify(self.product.title + "-" + self.name, allow_unicode=True))
+        self.slug = slugify(self.product.title + "-" +
+                            self.name, allow_unicode=True)
         super().save(*args, **kwargs)
         variant = self.document()
         variant_model_indexer.delay(variant)

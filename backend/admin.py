@@ -37,9 +37,15 @@ class ImageInline(admin.StackedInline):
 
 
 class ProductVariantsForm(ModelForm):
+    def url(self, obj):
+        return mark_safe('<a href="/products/{}/">{}</a>'.format(obj.slug, obj.title))
+
+    readonly_fields = ('url',)
+
     class Meta:
         model = Variant
-        fields = ('name', 'attribute_values', 'product', 'price', 'images',)
+        fields = ('name', 'attribute_values', 'product',
+                  'price', 'images', 'featured',)
 
 
 class ProductVariantsInline(admin.StackedInline):
@@ -77,11 +83,9 @@ class UserAdmin(admin.ModelAdmin):
 
 
 class ProductForm(ModelForm):
-    url = CharField()
-
     class Meta:
         model = Product
-        fields = ('title', 'description', 'featured', 'category',)
+        fields = ('title', 'description', 'category',)
 
 
 class CategoryForm(ModelForm):
@@ -93,12 +97,12 @@ class CategoryForm(ModelForm):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    def url(self, obj):
-        return mark_safe('<a href="/products/{}/">{}</a>'.format(obj.slug, obj.title))
+    #    def url(self, obj):
+    #        return mark_safe('<a href="/products/{}/">{}</a>'.format(obj.slug, obj.title))
 
     inlines = [ProductVariantsInline]
     form = ProductForm
-    readonly_fields = ('created_at', 'url',)
+    readonly_fields = ('created_at',)
 
 
 class AttributeAdmin(admin.ModelAdmin):
@@ -121,6 +125,7 @@ admin_site = AdminSite()
 
 admin_site.register(User, UserAdmin)
 admin_site.register(Product, ProductAdmin)
+# admin_site.register(Product)
 admin_site.register(Attribute, AttributeAdmin)
 admin_site.register(Category, CategoryAdmin)
 
