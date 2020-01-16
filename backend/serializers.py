@@ -61,7 +61,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'title', 'description', 'created_at',
-                  'categories', 'variants', 'slug')
+                  'categories', 'variants')
 
 
 class VariantSerializer(serializers.ModelSerializer):
@@ -84,7 +84,26 @@ class VariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variant
         fields = ('id', 'name', 'attribute_values',
-                  'product', 'price', 'images')
+                  'product', 'price', 'images', 'slug')
+
+
+class FeaturedProductsSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(many=False, read_only=True)
+    images = ImageSerializer(many=True, read_only=True)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["image"] = {**data["images"][0]}
+        data.pop("images")
+        data["name"] = "{} {}".format(data["product"]["title"], data["name"])
+        data["description"] = data["product"]["description"]
+        data.pop("product")
+
+        return data
+
+    class Meta:
+        model = Variant
+        fields = ('id', 'name', 'price', 'images', 'slug', 'product')
 
 
 class ESProductSerializer(serializers.ModelSerializer):

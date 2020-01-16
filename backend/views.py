@@ -88,7 +88,7 @@ class FeaturedProductViewSet(viewsets.ViewSet, generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    serializer_class = VariantSerializer
+    serializer_class = FeaturedProductsSerializer
 
     def get_queryset(self):
         products = Variant.objects.filter(featured=True)
@@ -125,6 +125,7 @@ class VariantViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveMode
     """
     queryset = Variant.objects.all()
     serializer_class = VariantSerializer
+    lookup_field = 'slug'
 
 
 class TokenObtainView(TokenObtainPairView):
