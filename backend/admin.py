@@ -45,7 +45,7 @@ class ProductVariantsForm(ModelForm):
     class Meta:
         model = Variant
         fields = ('name', 'attribute_values', 'product',
-                  'price', 'images', 'featured',)
+                  'price', 'images', 'featured', 'weight', 'size',)
 
 
 class ProductVariantsInline(admin.StackedInline):
@@ -137,4 +137,5 @@ admin_site.register(Order)
 admin_site.register(Cart)
 admin_site.register(Variant)
 admin_site.register(Image)
+admin_site.register(Size)
 #admin_site.register(Category, CustomAdmin)

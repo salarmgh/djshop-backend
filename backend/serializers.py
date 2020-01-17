@@ -41,6 +41,12 @@ class AttributeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'attributes')
 
 
+class SizeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Size
+        fields = ('id', 'value',)
+
+
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
@@ -52,7 +58,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'image', 'attributes')
+        fields = ('id', 'name', 'image', 'attributes', 'slug')
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -68,6 +74,7 @@ class VariantSerializer(serializers.ModelSerializer):
     attribute_values = AttributeValueSerializer(many=True, read_only=True)
     images = ImageSerializer(many=True, read_only=True)
     product = ProductSerializer(many=False, read_only=True)
+    size = SizeSerializer(many=True, read_only=True)
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -84,7 +91,7 @@ class VariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variant
         fields = ('id', 'name', 'attribute_values',
-                  'product', 'price', 'images', 'slug')
+                  'product', 'price', 'images', 'slug', 'weight', 'size')
 
 
 class FeaturedProductsSerializer(serializers.ModelSerializer):

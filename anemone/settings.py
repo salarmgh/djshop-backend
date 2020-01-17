@@ -188,7 +188,8 @@ JET_SIDE_MENU_ITEMS = [
             {'name': 'banner'},
             {'name': 'landingbanner'},
             {'name': 'cart'},
-            {'name': 'order'}
+            {'name': 'order'},
+            {'name': 'image'}
         ]
     }
 ]

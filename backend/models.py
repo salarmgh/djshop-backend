@@ -50,6 +50,13 @@ class AttributeValue(models.Model):
         return self.value
 
 
+class Size(models.Model):
+    value = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.value
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(allow_unicode=True, unique=True)
@@ -91,12 +98,15 @@ class Variant(models.Model):
     name = models.CharField(max_length=200)
     attribute_values = models.ManyToManyField(
         AttributeValue, related_name="variants", blank=True)
+    size = models.ManyToManyField(
+        Size, related_name="variants", blank=True)
     product = models.ForeignKey(
         Product, related_name='variants', blank=True, on_delete=models.CASCADE)
     price = models.PositiveIntegerField(default=0)
     images = models.ManyToManyField(Image, related_name="variants", blank=True)
     featured = models.BooleanField(default=False)
     slug = models.SlugField(allow_unicode=True, unique=True)
+    weight = models.FloatField()
 
     def document(self):
         product = {"title": self.product.title, "description": self.product.description, "slug": self.slug,
