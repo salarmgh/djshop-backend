@@ -128,6 +128,14 @@ class VariantViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveMode
     lookup_field = 'slug'
 
 
+class VariantByIdViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveModelMixin):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Variant.objects.all()
+    serializer_class = VariantSerializer
+
+
 class TokenObtainView(TokenObtainPairView):
     serializer_class = TokenObtainSerializer
 
@@ -249,3 +257,13 @@ class CreateOrderViewSet(viewsets.ViewSet):
         cart.save()
         cart.orders.set(orders)
         return Response()
+
+
+class CartVarientViewSet(viewsets.ViewSet, generics.ListAPIView):
+    serializer_class = VariantSerializer
+    lookup_url_kwarg = "ids"
+
+    def get_queryset(self):
+        ids = self.kwargs.get(self.lookup_url_kwarg).split(",")
+        queryset = Variant.objects.filter(pk__in=ids)
+        return queryset

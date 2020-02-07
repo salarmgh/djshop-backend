@@ -6,6 +6,7 @@ router = routers.DefaultRouter()
 
 router.register(r'products', ProductViewSet)
 router.register(r'variants', VariantViewSet)
+router.register(r'variants-id', VariantByIdViewSet)
 router.register(r'categories', CategoryViewSet)
 router.register(r'attributes', AttributeViewSet)
 router.register(r'attribute-values', AttributeValueViewSet)
@@ -21,4 +22,5 @@ router.register(r'orders', OrderViewSet)
 router.register(r'cart', CartViewSet)
 router.register(r'create-order', CreateOrderViewSet, basename="create-order")
 router.register(r'search', SearchViewSet, basename="search")
-
+router.register(r'variants-by-id/(?P<ids>[^/.]+)',
+                CartVarientViewSet, basename="variants-by-id")
