@@ -24,3 +24,4 @@ router.register(r'create-order', CreateOrderViewSet, basename="create-order")
 router.register(r'search', SearchViewSet, basename="search")
 router.register(r'variants-by-id/(?P<ids>[^/.]+)',
                 CartVarientViewSet, basename="variants-by-id")
+router.register(r'addresses', AddressesViewSet, basename="addresses")

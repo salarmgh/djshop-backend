@@ -27,6 +27,12 @@ class UserSerializer(serializers.ModelSerializer):
                   "last_name", "email", "number", "addresses")
 
 
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = ('id', 'user', 'location')
+
+
 class AttributeValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = AttributeValue

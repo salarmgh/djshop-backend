@@ -15,6 +15,15 @@ from elasticsearch_dsl import Q
 from rest_framework.decorators import action
 
 
+class AddressesViewSet(viewsets.ViewSet, generics.ListAPIView):
+    serializer_class = AddressSerializer
+
+    def get_queryset(self):
+        user = self.request.user.id
+        queryset = User.objects.get(pk=user).addresses.all()
+        return queryset
+
+
 class ProductViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveModelMixin):
     """
     API endpoint that allows users to be viewed or edited.
