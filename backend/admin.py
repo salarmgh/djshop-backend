@@ -56,6 +56,22 @@ class ProductVariantsInline(admin.StackedInline):
     verbose_name_plural = "Variants"
 
 
+class OrderForm(ModelForm):
+    readonly_fields = ('created_at',)
+
+    class Meta:
+        model = Order
+        fields = ('variant', 'count', 'user', 'price', 'total_price',)
+
+
+class OrderInline(admin.StackedInline):
+    model = Order
+    form = OrderForm
+    extra = 3
+    verbose_name = "Orders"
+    verbose_name_plural = "Orders"
+
+
 class AttributeValueInline(admin.StackedInline):
     model = AttributeValue
     extra = 3
@@ -82,6 +98,12 @@ class UserAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
+class CartForm(ModelForm):
+    class Meta:
+        model = Cart
+        fields = ('user', 'address', 'shipping_method',)
+
+
 class ProductForm(ModelForm):
     class Meta:
         model = Product
@@ -97,9 +119,6 @@ class CategoryForm(ModelForm):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    #    def url(self, obj):
-    #        return mark_safe('<a href="/products/{}/">{}</a>'.format(obj.slug, obj.title))
-
     inlines = [ProductVariantsInline]
     form = ProductForm
     readonly_fields = ('created_at',)
@@ -121,6 +140,12 @@ class CategoryAdmin(admin.ModelAdmin):
         model = Category
 
 
+class CartAdmin(admin.ModelAdmin):
+    readonly_fields = ('created_at', 'total_price',)
+    inlines = [OrderInline]
+    form = CartForm
+
+
 admin_site = AdminSite()
 
 admin_site.register(User, UserAdmin)
@@ -134,7 +159,7 @@ admin_site.register(Carousel)
 admin_site.register(Banner)
 admin_site.register(LandingBanner)
 admin_site.register(Order)
-admin_site.register(Cart)
+admin_site.register(Cart, CartAdmin)
 admin_site.register(Variant)
 admin_site.register(Image)
 admin_site.register(Size)

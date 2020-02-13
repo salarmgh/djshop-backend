@@ -25,6 +25,9 @@ class Address(models.Model):
     user = models.ForeignKey(
         User, related_name="addresses", on_delete=models.CASCADE, blank=True)
 
+    def __str__(self):
+        return self.location
+
 
 class Image(models.Model):
     title = models.CharField(max_length=300)
@@ -185,10 +188,26 @@ class LandingBanner(models.Model):
         return self.title
 
 
+class ShippingMethod(models.Model):
+    title = models.CharField(max_length=100)
+    price = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+
+
 class Cart(models.Model):
     user = models.ForeignKey(User, related_name="carts",
                              on_delete=models.CASCADE)
+    address = models.ForeignKey(
+        Address, related_name="carts", on_delete=models.CASCADE)
+    shipping_method = models.ForeignKey(
+        ShippingMethod, related_name="carts", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
+    total_price = models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.id)
 
 
 class Order(models.Model):
@@ -199,7 +218,9 @@ class Order(models.Model):
         User, related_name="orders", on_delete=models.CASCADE)
     cart = models.ForeignKey(
         Cart, related_name="orders", on_delete=models.CASCADE)
+    price = models.IntegerField(default=0)
+    total_price = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.variant.name
+        return self.variant.product.title + " " + self.variant.name

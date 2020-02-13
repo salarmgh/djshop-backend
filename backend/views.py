@@ -241,30 +241,28 @@ class SearchViewSet(viewsets.ViewSet):
 
 class CreateOrderViewSet(viewsets.ViewSet):
     def create(self, request):
-        products = request.data["products"]
-        orders = []
-        cart_price = 0
-        orders_price = 0
-        for product in products:
-            product["product"] = Product.objects.get(pk=product["product"])
-            product["price"] = product["product"].price
+        user = User.objects.get(pk=self.request.user.id)
+        data = request.data["products"]
+        products = data["products"]
+        address = Address.objects.get(pk=data["address"])
+        print(address)
+        shipping_method = ShippingMethod.objects.get(pk=data["shippingMethod"])
+        cart = Cart.objects.create(
+            user=user, address=address,
+            shipping_method=shipping_method)
 
-            attribute = product.pop("attribute")
-            for attr in attribute:
-                attribute_value = AttributeValue.objects.get(pk=attr)
-                product["price"] = product["price"] + attribute_value.price
-            product["price"] = float(product["price"]) * int(product["count"])
-            pprint(product)
-            order = Order(**product)
-            order.save()
-            order.attribute.set(attribute)
-            orders.append(order)
-            cart_price = cart_price + product["price"]
-
-        user = User.objects.get(pk=int(request.data["user"]))
-        cart = Cart(user=user, price=cart_price)
+        for variant in products.keys():
+            product_variant = Variant.objects.get(pk=variant)
+            count = products[variant]
+            order = Order.objects.create(variant=product_variant,
+                                         count=count, cart=cart, user=user,
+                                         price=product_variant.price,
+                                         total_price=product_variant.price * count)
+            cart.total_price = cart.total_price + order.total_price
         cart.save()
-        cart.orders.set(orders)
+        # for variant in products["products"].keys():
+        #    order = Order.objects.create(variant=Variant.objects.get(
+        #        variant), count=products["products"][variant], user=User.objects.get(pk=self.request.user.id), cart=cart)
         return Response()
 
 
