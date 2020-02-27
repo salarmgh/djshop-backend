@@ -1,0 +1,25 @@
+import backend.models import Category
+import Attribute
+import Product
+
+
+def create_category():
+    self.category_name = "category test"
+    self.image_name = 'test.jpg'
+    self.image_file = SimpleUploadedFile(name=self.image_name, content=open(
+        'backend/tests/assets/placeholder.jpg', 'rb').read(), content_type='image/jpeg')
+
+    self.product_attribute_name = "test attribute"
+
+    self.product_description = "test description"
+
+    self.attribute = Attribute.objects.create(
+        name=self.product_attribute_name)
+
+    self.category = Category.objects.create(
+        name=self.category_name, image=self.image_file)
+    self.category.attributes.set([self.attribute])
+    self.category.save()
+
+    self.product = Product.objects.create(title=generate_random_string(
+        15, 50), description=self.product_description, category=self.category)

@@ -16,6 +16,9 @@ from rest_framework.decorators import action
 
 
 class AddressesViewSet(viewsets.ViewSet, generics.ListAPIView):
+    """
+    API endpoint that allows addresses to be listed.
+    """
     serializer_class = AddressSerializer
 
     def get_queryset(self):
@@ -26,7 +29,7 @@ class AddressesViewSet(viewsets.ViewSet, generics.ListAPIView):
 
 class ProductViewSet(viewsets.ViewSet, generics.ListAPIView, mixins.RetrieveModelMixin):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows products to be viewed or edited.
     """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -108,6 +111,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
