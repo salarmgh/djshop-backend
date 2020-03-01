@@ -36,6 +36,14 @@ class Image(models.Model):
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        documents = []
+        for variant in self.variants.all():
+            documents.append(variant.document())
+
+        product_model_indexer.delay(documents)
+
 
 class Attribute(models.Model):
     name = models.CharField(max_length=100)
@@ -52,12 +60,28 @@ class AttributeValue(models.Model):
     def __str__(self):
         return self.value
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        documents = []
+        for variant in self.variants.all():
+            documents.append(variant.document())
+
+        product_model_indexer.delay(documents)
+
 
 class Size(models.Model):
     value = models.CharField(max_length=100)
 
     def __str__(self):
         return self.value
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        documents = []
+        for variant in self.variants.all():
+            documents.append(variant.document())
+
+        product_model_indexer.delay(documents)
 
 
 class Category(models.Model):
