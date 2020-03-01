@@ -87,8 +87,12 @@ class Product(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        product_model_indexer.delay(self.variants.all())
         super().save(*args, **kwargs)
+        documents = []
+        for variant in self.variants.all():
+            documents.append(variant.document())
+
+        product_model_indexer.delay(documents)
 
 
 class Variant(models.Model):
