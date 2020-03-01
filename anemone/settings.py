@@ -126,6 +126,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 CORS_ORIGIN_WHITELIST = [
     "http://localhost",
+    "https://anemonejewellery.ir",
+    "https://dev.anemonejewellery.ir"
 ]
 
 CORS_ALLOW_METHODS = [
