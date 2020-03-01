@@ -4,7 +4,7 @@ from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from .validators import *
-from .tasks import variant_model_indexer
+from .tasks import variant_model_indexer, product_model_indexer
 
 
 class User(AbstractUser):
@@ -83,18 +83,16 @@ class Product(models.Model):
     category = models.ForeignKey(
         Category, related_name="products", on_delete=models.CASCADE)
 
-    def indexing(self):
-        obj = ProductIndex(
-            meta={'id': self.id},
-            title=self.title,
-            featured=self.featured,
-            image=self.image.image.url,
-        )
-        obj.save()
-        return obj.to_dict(include_meta=True)
-
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        documents = []
+        for variant in self.variants.all():
+            documents.append(variant.document())
+
+        product_model_indexer.delay(documents)
 
 
 class Variant(models.Model):
@@ -129,7 +127,6 @@ class Variant(models.Model):
         return variant
 
     def save(self, *args, **kwargs):
-        print(slugify(self.product.title + "-" + self.name, allow_unicode=True))
         self.slug = slugify(self.product.title + "-" +
                             self.name, allow_unicode=True)
         super().save(*args, **kwargs)
