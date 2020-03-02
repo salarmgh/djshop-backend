@@ -26,8 +26,8 @@ def variant_bulk_indexer(self):
 @shared_task(bind=True, max_retries=600)
 def product_model_indexer(self, variants):
     for variant in variants:
-        document = VariantDocument(meta={'id': model["id"]}, name=model["name"], price=model["price"],
-                                   product=model["product"], images=model["images"], attributes=model["attributes"], category=model["category"])
+        document = VariantDocument(meta={'id': variant["id"]}, name=variant["name"], price=variant["price"],
+                                   product=variant["product"], images=variant["images"], attributes=variant["attributes"], category=variant["category"])
         try:
             document.save()
         except Exception as e:
