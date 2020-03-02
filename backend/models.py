@@ -38,11 +38,13 @@ class Image(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        documents = []
-        for variant in self.variants.all():
-            documents.append(variant.document())
+        variants = self.variants.all()
+        if variants:
+            documents = []
+            for variant in self.variants.all():
+                documents.append(variant.document())
 
-        product_model_indexer.delay(documents)
+            product_model_indexer.delay(documents)
 
 
 class Attribute(models.Model):
