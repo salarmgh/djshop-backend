@@ -42,7 +42,7 @@ class Image(models.Model):
         for variant in self.variants.all():
             documents.append(variant.document())
 
-        product_model_indefxer.delay(documents)
+        product_model_indexer.delay(documents)
 
 
 class Attribute(models.Model):
