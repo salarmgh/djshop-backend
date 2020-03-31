@@ -36,15 +36,15 @@ class Image(models.Model):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        variants = self.variants.all()
-        if variants:
-            documents = []
-            for variant in self.variants.all():
-                documents.append(variant.document())
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     variants = self.variants.all()
+    #     if variants:
+    #         documents = []
+    #         for variant in self.variants.all():
+    #             documents.append(variant.document())
 
-            product_model_indexer.delay(documents)
+    #         product_model_indexer.delay(documents)
 
 
 class Attribute(models.Model):
@@ -62,13 +62,13 @@ class AttributeValue(models.Model):
     def __str__(self):
         return self.value
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        documents = []
-        for variant in self.variants.all():
-            documents.append(variant.document())
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     documents = []
+    #     for variant in self.variants.all():
+    #         documents.append(variant.document())
 
-        product_model_indexer.delay(documents)
+    #     product_model_indexer.delay(documents)
 
 
 class Size(models.Model):
@@ -112,13 +112,13 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        documents = []
-        for variant in self.variants.all():
-            documents.append(variant.document())
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     documents = []
+    #     for variant in self.variants.all():
+    #         documents.append(variant.document())
 
-        product_model_indexer.delay(documents)
+    #     product_model_indexer.delay(documents)
 
 
 class Variant(models.Model):
